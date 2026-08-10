@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IncidentAssessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "incident_id",
+    "lap",
+    "segment",
+    "reported_phenomenon",
+    "baseline_evidence",
+    "echo_match",
+    "driver_warning_lead_time_s",
+    "recurrence_state",
+    "human_message"
+  ],
+  "properties": {
+    "incident_id": { "type": "string" },
+    "lap": { "type": "integer", "minimum": 0 },
+    "segment": { "type": "string" },
+    "reported_phenomenon": {
+      "type": "string",
+      "enum": [
+        "EXIT_TRACTION_REAR",
+        "FRONT_TURNIN_BRAKE",
+        "TYRE_GRIP_DEGRADATION",
+        "VISIBILITY_TRACK_CONDITION",
+        "MECHANICAL_OTHER"
+      ]
+    },
+    "baseline_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["throttle_pickup_delta_pct", "sector_delta_s", "status"],
+      "properties": {
+        "throttle_pickup_delta_pct": { "type": "number" },
+        "sector_delta_s": { "type": "number" },
+        "status": {
+          "type": "string",
+          "enum": ["BEHAVIOR_CONSISTENT", "NO_DEVIATION", "INSUFFICIENT_DATA"]
+        }
+      }
+    },
+    "echo_match": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "incident_id",
+        "semantic_similarity",
+        "telemetry_similarity",
+        "same_segment",
+        "label"
+      ],
+      "properties": {
+        "incident_id": { "type": "string" },
+        "semantic_similarity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "telemetry_similarity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "same_segment": { "type": "boolean" },
+        "label": { "type": "string" }
+      }
+    },
+    "driver_warning_lead_time_s": { "type": ["number", "null"] },
+    "recurrence_state": {
+      "type": "string",
+      "enum": ["NONE", "POSSIBLE_RECURRENCE", "CONFIRMED_BY_RADIO"]
+    },
+    "human_message": { "type": "string" }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "incident_id": "INC-017",
+  "transcript": "Rear is moving on throttle.",
+  "tone_label": "ELEVATED_AROUSAL",
+  "tone_score": 0.73,
+  "tone_confidence": 0.61,
+  "complaint_category": "EXIT_TRACTION_REAR",
+  "category_confidence": 0.86,
+  "text_tone_disagreement": "MODERATE"
+}

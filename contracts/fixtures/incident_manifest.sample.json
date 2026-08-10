@@ -1,0 +1,18 @@
+[
+  {
+    "incident_id": "INC-017",
+    "session_id": "PLACEHOLDER_SESSION",
+    "driver": "PLACEHOLDER_DRIVER",
+    "event_time_ms": 0,
+    "lap": 17,
+    "sector_or_corner": "T7_EXIT",
+    "audio_path": "data/audio/INC-017.wav",
+    "verified_transcript": "Rear is moving on throttle.",
+    "complaint_label": "EXIT_TRACTION_REAR",
+    "telemetry_window_path": "data/telemetry/INC-017.parquet",
+    "tyre_compound": "OPTIONAL",
+    "tyre_age_laps": null,
+    "lap_delta_s": null,
+    "verification_notes": "Placeholder entry. Replace with a manually verified incident before demo."
+  }
+]

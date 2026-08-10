@@ -1,0 +1,42 @@
+name: tests
+
+on:
+  pull_request:
+    branches: [integration/main]
+  push:
+    branches: [integration/main]
+
+jobs:
+  radio_ai:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r services/radio_ai/requirements.txt
+      - run: pytest services/radio_ai/tests
+        working-directory: services/radio_ai
+
+  core_api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r services/core_api/requirements.txt
+      - run: pytest services/core_api/tests
+        working-directory: services/core_api
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install
+        working-directory: apps/web
+      - run: npm run build
+        working-directory: apps/web

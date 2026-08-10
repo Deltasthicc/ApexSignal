@@ -1,0 +1,21 @@
+{
+  "incident_id": "INC-031",
+  "lap": 31,
+  "segment": "T7_EXIT",
+  "reported_phenomenon": "EXIT_TRACTION_REAR",
+  "baseline_evidence": {
+    "throttle_pickup_delta_pct": -11.0,
+    "sector_delta_s": 0.18,
+    "status": "BEHAVIOR_CONSISTENT"
+  },
+  "echo_match": {
+    "incident_id": "INC-017",
+    "semantic_similarity": 0.88,
+    "telemetry_similarity": 0.81,
+    "same_segment": true,
+    "label": "STRONG_PROTOTYPE_MATCH"
+  },
+  "driver_warning_lead_time_s": 42,
+  "recurrence_state": "POSSIBLE_RECURRENCE",
+  "human_message": "Behavior is consistent with a previously reported concern; review recommended."
+}

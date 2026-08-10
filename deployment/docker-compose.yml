@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  radio_ai:
+    build:
+      context: ../services/radio_ai
+    ports:
+      - "8002:8002"
+    env_file:
+      - ../services/radio_ai/.env
+    volumes:
+      - ../data:/app/data:ro
+
+  core_api:
+    build:
+      context: ../services/core_api
+    ports:
+      - "8001:8001"
+    env_file:
+      - ../services/core_api/.env
+    depends_on:
+      - radio_ai
+    volumes:
+      - ../data:/app/data:ro
+      - ../storage:/app/storage
+
+  web:
+    build:
+      context: ../apps/web
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_CORE_API_BASE_URL=http://core_api:8001
+    depends_on:
+      - core_api
