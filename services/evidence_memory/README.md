@@ -120,3 +120,51 @@ scores. It exists only because the frozen contract has one
 `telemetry_similarity` field. It is **not** a composite risk score: no
 channel is weighted, and `per_channel` always travels with it so the
 number can be taken apart in front of a judge.
+
+---
+
+## Retrieval gate — measured, not assumed
+
+`all-MiniLM-L6-v2` was run over 23 realistic F1 radio phrasings across
+the five taxonomy categories plus non-complaint chatter (247 pairs).
+
+| | median | p95 | max |
+|---|---|---|---|
+| Same complaint category | 0.382 | 0.594 | 0.618 |
+| Different categories | 0.213 | 0.438 | 0.683 |
+
+**The distributions overlap, and not incidentally.** A cross-category
+pair scores *above* a genuine same-category repeat:
+
+```
+0.429   "Rear is moving on throttle."  vs  "The front is washing out under braking."   <- DIFFERENT complaint
+0.422   "Rear is moving on throttle."  vs  "The rear stepped out again on corner exit."  <- SAME complaint
+```
+
+No cosine cut separates these. Short idiomatic radio gives MiniLM too
+little to work with, and the original 0.6 guess would have rejected
+almost every genuine repeat (5.4% retained).
+
+So the gate is **two independent conditions**, neither derived from the
+other:
+
+1. **Same complaint category**, from Workstream B's classifier — a model
+   trained for exactly this decision, rather than cosine over a six-word
+   sentence. This does the precision work.
+2. **Semantic cosine ≥ 0.40** — catches the case where the category label
+   is right but the wording describes something unrelated. Set for
+   recall, since (1) handles precision: 0.40 sits above the
+   cross-category median (0.213) and p75 (0.301) while retaining roughly
+   three-quarters of genuine same-category repeats.
+
+Telemetry similarity is **not** part of the gate. A driver reporting the
+same thing again while the car looks different is a real and interesting
+case; gating on telemetry would hide it.
+
+`test_embeddings_real_model.py` guards both numbers against the live
+model, including a test that fails if cosine ever *does* separate the
+categories — at which point the category gate can be revisited.
+
+> **ASSUMPTION to re-check:** calibrated on clean hand-written phrasings,
+> not real ASR output, which will be noisier and may score lower. Re-run
+> the calibration once Workstream B has real transcripts.
