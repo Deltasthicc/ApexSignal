@@ -17,6 +17,23 @@ no exception. This is a smoke test, not a quality check.
 |---|---|---|---|
 | 0. Pipeline runs | No exceptions on 3-5 real clips | | |
 
+## Gate 0.5 — single-speaker check (do this while listening for gate 2)
+
+`MikCil/f1-team-radio` mixes engineer and driver voices within a single
+clip (confirmed both in the dataset's own sourcing notes and directly
+in our own extracted samples — the MAXVER01 status-update clip has
+both). Neither `asr.py` nor `tone.py` does speaker separation. There's
+no time to build real diarization before submission, so the mitigation
+is curation, not code: when picking clips, prefer ones where the
+**driver** is speaking for most/all of the clip's duration, and reject
+or trim ones that are mostly back-and-forth dialogue. If a demo-critical
+clip has real driver+engineer overlap, say so explicitly rather than
+letting a tone score silently reflect the wrong (or a blended) voice.
+
+| Gate | Threshold | Result | Verdict |
+|---|---|---|---|
+| 0.5. Every demo-critical clip is single-speaker (driver-dominant) | Yes/No, per clip | | |
+
 ## Gate 1 — ASR quality (meaning-critical, not raw WER)
 
 Manually correct the transcript for each benchmarked clip yourself; the

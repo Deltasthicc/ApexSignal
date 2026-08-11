@@ -10,7 +10,7 @@ Built for **AI Race Month — GrandPrix Hackathon @ Paytm**, anchored on **Probl
 
 Formula 1 teams have dense telemetry, but a driver can perceive a change in handling, grip, or braking before it shows up in a lap-time graph. That feedback arrives as short, subjective radio language ("rear's moving," "no front," "same thing again"), while telemetry arrives as numbers. Nobody connects the two.
 
-ApexSignal transcribes team radio, scores acoustic tone/arousal, normalizes the driver's language into a fixed complaint taxonomy, aligns the report with telemetry and lap context, retrieves similar historical incidents, and watches later telemetry for patterns that resemble earlier driver-reported concerns.
+ApexSignal transcribes team radio, scores acoustic tone/arousal, normalizes the driver's language into a fixed complaint taxonomy, aligns the report with telemetry and lap context, and retrieves similar historical incidents. When a driver reports something again, ApexSignal checks whether the new report's telemetry resembles an earlier incident's and surfaces that match as evidence.
 
 It reports **measured lead time**, **behavior consistent with a complaint**, and **probable recurrence**. It does not claim lie detection, psychological diagnosis, confirmed mechanical faults, or autonomous strategy decisions. Every number on screen traces back to source data or a documented model output.
 
@@ -38,9 +38,15 @@ Curated race replay (radio + timestamp + cached telemetry)
                                                        |
                                     Unified Incident Card
                                     (evidence + uncertainty, one screen)
-
-Background path: cached telemetry stream --> Recurrence Monitor --> possible-recurrence alert
 ```
+
+Recurrence is flagged when a *new* radio event's telemetry resembles a
+stored incident's — not by a standing background process that watches
+telemetry independent of radio events. ApexSignal cannot catch a
+recurrence before the driver reports it again; it can only recognize
+one faster once they do. A telemetry-only background monitor was in
+the original concept (see `docs/PROJECT_CHARTER.md`) but is out of
+scope for this build.
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full request flow and design decisions.
 
