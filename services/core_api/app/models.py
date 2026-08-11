@@ -31,6 +31,41 @@ class RecurrenceState(str, Enum):
     CONFIRMED_BY_RADIO = "CONFIRMED_BY_RADIO"
 
 
+class ToneLabel(str, Enum):
+    CALM = "CALM"
+    ELEVATED_AROUSAL = "ELEVATED_AROUSAL"
+    FATIGUED = "FATIGUED"
+
+
+class TextToneDisagreement(str, Enum):
+    LOW = "LOW"
+    MODERATE = "MODERATE"
+    HIGH = "HIGH"
+
+
+class RadioAnalysisOutput(BaseModel):
+    """Workstream B's output, consumed by this service.
+
+    Mirrors contracts/schemas/radio_analysis_output.schema.json exactly.
+    core_api never imports services/radio_ai; this JSON shape is the only
+    integration point.
+
+    `text_tone_disagreement` is optional and is deliberately not consumed
+    by the evidence pipeline: The Mask is a post-core feature (charter
+    section 5) and the contract's cut rules allow it to be dropped
+    entirely. Nothing here breaks when it is absent.
+    """
+
+    incident_id: str
+    transcript: str
+    tone_label: ToneLabel
+    tone_score: float = Field(ge=0, le=1)
+    tone_confidence: float = Field(ge=0, le=1)
+    complaint_category: ReportedPhenomenon | None = None
+    category_confidence: float | None = Field(default=None, ge=0, le=1)
+    text_tone_disagreement: TextToneDisagreement | None = None
+
+
 class BaselineEvidence(BaseModel):
     throttle_pickup_delta_pct: float
     sector_delta_s: float
