@@ -27,9 +27,12 @@ from __future__ import annotations
 import argparse
 import csv
 import re
+import sys
 from pathlib import Path
 
-from app.config import ModelConfig
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from app.config import ModelConfig  # noqa: E402
 
 TEXT_COLUMNS = [
     "id",
