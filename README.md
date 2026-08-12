@@ -90,17 +90,47 @@ Ownership is enforced by folder, not by convention. See [`CONTRIBUTING.md`](CONT
 
 Each service is independently runnable against fixture data from Day 1. No service should require another service to be running.
 
+### Fastest path — one screen, zero backend setup
+
 ```bash
-# Backend services
-cd services/core_api && pip install -r requirements.txt && uvicorn app.main:app --reload --port 8001
-cd services/radio_ai && pip install -r requirements.txt && uvicorn app.main:app --reload --port 8002
-
-# Mock server (fixture-backed, unblocks frontend work)
 cd mock_server && pip install -r requirements.txt && uvicorn server:app --reload --port 8000
-
-# Frontend
-cd apps/web && npm install && npm run dev
+# new terminal
+cd apps/web && npm install && cp .env.local.example .env.local && npm run dev
 ```
+
+Open `http://localhost:3000`. This runs the full ApexSignal UI — replay
+timeline, radio pins, tone/complaint classification, baseline evidence,
+the gold-incident lead-time card, and the Pit-Wall toggle — against
+`mock_server`'s fixture data (`contracts/fixtures/`). No GPU, no model
+downloads, no other service required.
+
+### Full stack, real `core_api`
+
+```bash
+cd services/core_api && pip install -r requirements.txt && cp .env.example .env && uvicorn app.main:app --reload --port 8001
+# new terminal
+cd mock_server && pip install -r requirements.txt && uvicorn server:app --reload --port 8000
+# new terminal
+cd apps/web && npm install && npm run dev
+# then set NEXT_PUBLIC_CORE_API_BASE_URL=http://localhost:8001 in apps/web/.env.local
+# (mock_server still serves /v1/radio/analyze via NEXT_PUBLIC_RADIO_AI_BASE_URL=http://localhost:8000)
+```
+
+`services/core_api` runs `EVALUATE_MODE=fixture` by default (162 tests
+pass against it), so this exercises the real evidence-pipeline service
+without needing Workstream A's real telemetry/manifest data.
+
+### Docker Compose
+
+```bash
+docker compose -f deployment/docker-compose.yml up --build
+```
+
+Brings up `mock_server` (8000), `core_api` (8001, fixture mode), and
+`web` (3000) — the same fixture-backed demo, containerized. The real
+`services/radio_ai` pipeline (Whisper + tone + classifier models) is
+opt-in and GPU-oriented; add `--profile live` to also build and start
+it.
 
 Copy `.env.example` to `.env` in each service directory and fill in real values before running against live models. Never commit `.env`.
 

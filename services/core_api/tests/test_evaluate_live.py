@@ -383,7 +383,8 @@ def test_similarity_is_described_as_prototype_not_probability(client, world):
 
 
 def test_health_needs_no_heavy_dependencies(client):
-    assert client.get("/health").json() == {"status": "ok"}
+    body = client.get("/health").json()
+    assert body["status"] == "ok"
 
 
 # --- ingest --------------------------------------------------------------
@@ -397,10 +398,10 @@ def test_ingest_loads_the_manifest_into_the_store(tmp_path, monkeypatch):
     monkeypatch.setenv("CORE_API_MANIFEST_PATH", str(manifest))
     monkeypatch.setenv("CORE_API_DB_PATH", str(db_path))
 
-    assert ingest() == 1
+    assert ingest() == 3
 
     connection = db.connect(db_path)
-    stored = db.get_incident(connection, "INC-017")
+    stored = db.get_incident(connection, "INC-114")
     connection.close()
     assert stored is not None
     assert stored.segment == "T7_EXIT"

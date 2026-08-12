@@ -7,4 +7,6 @@ client = TestClient(app)
 
 def test_health_ok():
     response = client.get("/health")
-    assert response.json() == {"status": "ok"}
+    body = response.json()
+    assert body["status"] == "ok"
+    assert body["evaluate_mode"] in {"fixture", "live"}

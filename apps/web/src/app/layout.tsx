@@ -3,7 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "ApexSignal — Pit-Wall Incident Inspector",
-  description: "Evidence-driven incident memory for the F1 pit wall.",
+  description:
+    "Evidence-driven incident memory for the F1 pit wall: race radio, driver tone, and telemetry baseline in one screen.",
 };
 
 export default function RootLayout({
@@ -13,6 +14,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

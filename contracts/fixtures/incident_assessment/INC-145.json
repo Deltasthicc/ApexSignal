@@ -1,0 +1,15 @@
+{
+  "incident_id": "INC-145",
+  "lap": 45,
+  "segment": "T3_APEX",
+  "reported_phenomenon": "FRONT_TURNIN_BRAKE",
+  "baseline_evidence": {
+    "throttle_pickup_delta_pct": 1.2,
+    "sector_delta_s": -0.02,
+    "status": "NO_DEVIATION"
+  },
+  "echo_match": null,
+  "driver_warning_lead_time_s": null,
+  "recurrence_state": "NONE",
+  "human_message": "Telemetry at this segment is within the driver's own recent baseline; no deviation measured. No earlier report cleared the retrieval threshold. No measurable lead-time established."
+}

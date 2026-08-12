@@ -1,0 +1,10 @@
+{
+  "incident_id": "INC-145",
+  "transcript": "Front's just not turning in anymore through Three.",
+  "tone_label": "ELEVATED_AROUSAL",
+  "tone_score": 0.58,
+  "tone_confidence": 0.55,
+  "complaint_category": "FRONT_TURNIN_BRAKE",
+  "category_confidence": 0.67,
+  "text_tone_disagreement": "LOW"
+}

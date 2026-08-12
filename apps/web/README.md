@@ -1,7 +1,9 @@
 # apps/web — Workstream D
 
-The Pit-Wall Incident Inspector. One screen, one incident card. Not
-four module tabs.
+The Pit-Wall Incident Inspector. One screen: a race replay timeline
+with radio pins, an incident detail panel, a gold-incident lead-time
+card, a Pit-Wall view toggle, and a clip upload panel. Not four module
+tabs.
 
 ## Owns
 

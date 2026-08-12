@@ -1,7 +1,21 @@
 version: "3.9"
 
+# Default `docker compose up --build` starts mock_server + core_api + web
+# only -- everything the judged demo needs, all fixture-backed, no GPU
+# and no multi-GB model download. radio_ai (the real ASR/tone/classifier
+# pipeline) is heavy and GPU-oriented; it's opt-in behind the `live`
+# profile: `docker compose --profile live up --build`.
+
 services:
+  mock_server:
+    build:
+      context: ..
+      dockerfile: mock_server/Dockerfile
+    ports:
+      - "8000:8000"
+
   radio_ai:
+    profiles: ["live"]
     build:
       context: ..
       dockerfile: services/radio_ai/Dockerfile
@@ -22,8 +36,11 @@ services:
       - "8001:8001"
     env_file:
       - ../services/core_api/.env
-    depends_on:
-      - radio_ai
+    # Not `depends_on: radio_ai` -- core_api's default EVALUATE_MODE=fixture
+    # reads contracts/fixtures/ directly and never calls radio_ai over
+    # HTTP even in live mode (see contracts/api_contract.md, "Output
+    # location"). Forcing radio_ai to build just to start core_api would
+    # make the fast path slow for no reason.
     volumes:
       - ../data:/srv/data:ro
       - ../storage:/srv/storage
@@ -32,8 +49,19 @@ services:
     build:
       context: ../apps/web
       args:
-        NEXT_PUBLIC_CORE_API_BASE_URL: http://core_api:8001
+        # apps/web fetches these directly from the browser (client
+        # component), not via Next.js SSR -- so both must be URLs the
+        # HOST machine's browser can reach (the published ports below),
+        # never the compose-network hostnames.
+        NEXT_PUBLIC_CORE_API_BASE_URL: http://localhost:8001
+        # Points at mock_server (always up, fixture-backed) rather than
+        # the real radio_ai container, which is opt-in via --profile live
+        # and needs GPU-class hardware to be fast. Rebuild web with
+        # NEXT_PUBLIC_RADIO_AI_BASE_URL=http://localhost:8002 to demo the
+        # real pipeline once `docker compose --profile live up` is running.
+        NEXT_PUBLIC_RADIO_AI_BASE_URL: http://localhost:8000
     ports:
       - "3000:3000"
     depends_on:
       - core_api
+      - mock_server

@@ -1,0 +1,10 @@
+{
+  "incident_id": "INC-114",
+  "transcript": "Rear is moving on throttle exiting Turn 7.",
+  "tone_label": "ELEVATED_AROUSAL",
+  "tone_score": 0.71,
+  "tone_confidence": 0.64,
+  "complaint_category": "EXIT_TRACTION_REAR",
+  "category_confidence": 0.83,
+  "text_tone_disagreement": "LOW"
+}

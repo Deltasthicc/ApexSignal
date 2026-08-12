@@ -12,6 +12,7 @@ venv/
 node_modules/
 .next/
 out/
+*.tsbuildinfo
 apps/web/.env*.local
 
 # Env files
@@ -34,6 +35,10 @@ data/radio_analysis/*
 *.wav
 *.mp3
 !contracts/fixtures/**
+# apps/web ships its own small, deliberately-committed static assets
+# (hero clip etc.) -- distinct from the regenerated data/ audio corpus
+# the *.mp3 rule above is for.
+!apps/web/public/audio/**
 
 # Model caches
 .cache/

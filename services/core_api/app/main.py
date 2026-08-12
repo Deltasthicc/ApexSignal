@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import load_settings
 from app.models import IncidentAssessment
@@ -22,17 +23,38 @@ logger = logging.getLogger("core_api")
 
 app = FastAPI(title="ApexSignal core_api")
 
-FIXTURE_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "contracts"
-    / "fixtures"
-    / "incident_assessment.sample.json"
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
+CONTRACTS_DIR = Path(__file__).resolve().parents[3] / "contracts"
+FIXTURES_DIR = CONTRACTS_DIR / "fixtures"
+FIXTURE_PATH = FIXTURES_DIR / "incident_assessment.sample.json"
+FIXTURE_MANIFEST_PATH = FIXTURES_DIR / "incident_manifest.sample.json"
+
+
+def _fixture_assessment_payload(incident_id: str) -> dict:
+    """Prefer a per-incident fixture (contracts/fixtures/incident_assessment/
+    {id}.json) so the demo timeline can show distinct incidents; fall back
+    to the single generic sample for any id without one, same as before."""
+    per_incident = FIXTURES_DIR / "incident_assessment" / f"{incident_id}.json"
+    if per_incident.exists():
+        return json.loads(per_incident.read_text())
+    payload = json.loads(FIXTURE_PATH.read_text())
+    payload["incident_id"] = incident_id
+    return payload
 
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "evaluate_mode": os.environ.get("EVALUATE_MODE", "fixture"),
+        "service": "core_api",
+    }
 
 
 @app.post("/v1/incidents/evaluate", response_model=IncidentAssessment)
@@ -47,8 +69,7 @@ async def evaluate(incident_id: str) -> IncidentAssessment:
     """
     mode = os.environ.get("EVALUATE_MODE", "fixture")
     if mode == "fixture":
-        payload = json.loads(FIXTURE_PATH.read_text())
-        payload["incident_id"] = incident_id
+        payload = _fixture_assessment_payload(incident_id)
         return IncidentAssessment.model_validate(payload)
 
     return _evaluate_live(incident_id)
@@ -57,6 +78,47 @@ async def evaluate(incident_id: str) -> IncidentAssessment:
 @app.get("/v1/incidents/{incident_id}", response_model=IncidentAssessment)
 async def get_incident(incident_id: str) -> IncidentAssessment:
     return await evaluate(incident_id)
+
+
+@app.get("/v1/replay/frame")
+async def replay_frame(index: int = 0) -> dict:
+    """One manifest entry (radio + telemetry refs) by position.
+
+    Documented in contracts/api_contract.md since Day 1 but previously
+    unimplemented on core_api -- only mock_server served it. Fixture mode
+    reads the bundled demo manifest; live mode reads Workstream A's real
+    data/incident_manifest.json via the same settings the evaluate path
+    uses, so this 404s with a clear message rather than fabricating a
+    frame when that file is missing.
+    """
+    manifest = _load_manifest()
+    if index < 0 or index >= len(manifest):
+        raise HTTPException(status_code=404, detail="No frame at this index")
+    return manifest[index]
+
+
+@app.get("/v1/replay/manifest")
+async def replay_manifest() -> list:
+    """Full session manifest in one call, for the timeline UI."""
+    return _load_manifest()
+
+
+def _load_manifest() -> list:
+    mode = os.environ.get("EVALUATE_MODE", "fixture")
+    if mode == "fixture":
+        return json.loads(FIXTURE_MANIFEST_PATH.read_text())
+
+    settings = load_settings()
+    if not settings.manifest_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"incident manifest not found at {settings.manifest_path}. "
+                f"Set CORE_API_MANIFEST_PATH, or run Workstream A's "
+                f"build_incident_manifest.py."
+            ),
+        )
+    return json.loads(settings.manifest_path.read_text())
 
 
 def _evaluate_live(incident_id: str) -> IncidentAssessment:

@@ -1,0 +1,10 @@
+{
+  "incident_id": "INC-117",
+  "transcript": "Same thing again, rear stepping out on throttle at Turn 7.",
+  "tone_label": "ELEVATED_AROUSAL",
+  "tone_score": 0.79,
+  "tone_confidence": 0.72,
+  "complaint_category": "EXIT_TRACTION_REAR",
+  "category_confidence": 0.89,
+  "text_tone_disagreement": "MODERATE"
+}

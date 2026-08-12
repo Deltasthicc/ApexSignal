@@ -1,0 +1,15 @@
+{
+  "incident_id": "INC-114",
+  "lap": 14,
+  "segment": "T7_EXIT",
+  "reported_phenomenon": "EXIT_TRACTION_REAR",
+  "baseline_evidence": {
+    "throttle_pickup_delta_pct": 0.0,
+    "sector_delta_s": 0.0,
+    "status": "INSUFFICIENT_DATA"
+  },
+  "echo_match": null,
+  "driver_warning_lead_time_s": null,
+  "recurrence_state": "NONE",
+  "human_message": "Not enough baseline laps at this segment to compare against the driver's own recent behaviour. No earlier report cleared the retrieval threshold. No measurable lead-time established."
+}

@@ -11,8 +11,16 @@ import json
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="ApexSignal mock_server")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 FIXTURES_DIR = Path(__file__).resolve().parents[1] / "contracts" / "fixtures"
 
@@ -21,23 +29,34 @@ def _load(name: str):
     return json.loads((FIXTURES_DIR / name).read_text())
 
 
+def _load_per_incident(subdir: str, incident_id: str, default_name: str):
+    """Prefer contracts/fixtures/{subdir}/{incident_id}.json; fall back to
+    the single generic sample so unknown ids still return a valid shape."""
+    candidate = FIXTURES_DIR / subdir / f"{incident_id}.json"
+    if candidate.exists():
+        return json.loads(candidate.read_text())
+    payload = _load(default_name)
+    payload["incident_id"] = incident_id
+    return payload
+
+
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    return {"status": "ok", "evaluate_mode": "fixture", "service": "mock_server"}
 
 
 @app.post("/v1/radio/analyze")
 def analyze(incident_id: str) -> dict:
-    payload = _load("radio_analysis_output.sample.json")
-    payload["incident_id"] = incident_id
-    return payload
+    return _load_per_incident(
+        "radio_analysis", incident_id, "radio_analysis_output.sample.json"
+    )
 
 
 @app.post("/v1/incidents/evaluate")
 def evaluate(incident_id: str) -> dict:
-    payload = _load("incident_assessment.sample.json")
-    payload["incident_id"] = incident_id
-    return payload
+    return _load_per_incident(
+        "incident_assessment", incident_id, "incident_assessment.sample.json"
+    )
 
 
 @app.get("/v1/incidents/{incident_id}")
@@ -51,3 +70,11 @@ def replay_frame(index: int = 0) -> dict:
     if index < 0 or index >= len(manifest):
         raise HTTPException(status_code=404, detail="No frame at this index")
     return manifest[index]
+
+
+@app.get("/v1/replay/manifest")
+def replay_manifest() -> list:
+    """Full session manifest in one call, so the timeline UI doesn't have
+    to probe /v1/replay/frame one index at a time. Additive convenience
+    endpoint -- same underlying fixture data as /v1/replay/frame."""
+    return _load("incident_manifest.sample.json")

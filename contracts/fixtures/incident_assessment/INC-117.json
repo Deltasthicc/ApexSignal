@@ -1,0 +1,21 @@
+{
+  "incident_id": "INC-117",
+  "lap": 17,
+  "segment": "T7_EXIT",
+  "reported_phenomenon": "EXIT_TRACTION_REAR",
+  "baseline_evidence": {
+    "throttle_pickup_delta_pct": -9.4,
+    "sector_delta_s": 0.24,
+    "status": "BEHAVIOR_CONSISTENT"
+  },
+  "echo_match": {
+    "incident_id": "INC-114",
+    "semantic_similarity": 0.91,
+    "telemetry_similarity": 0.78,
+    "same_segment": true,
+    "label": "STRONG_PROTOTYPE_MATCH"
+  },
+  "driver_warning_lead_time_s": 189.4,
+  "recurrence_state": "CONFIRMED_BY_RADIO",
+  "human_message": "Telemetry at this segment deviates from the driver's own recent baseline, consistent with the reported phenomenon. Resembles an earlier reported concern (INC-114) by prototype similarity. An observable performance change followed the radio call by 189.4s. The driver's message refers to a repeat."
+}
