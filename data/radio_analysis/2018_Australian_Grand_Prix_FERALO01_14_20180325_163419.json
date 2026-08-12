@@ -1,0 +1,10 @@
+{
+  "incident_id": "2018_Australian_Grand_Prix_FERALO01_14_20180325_163419",
+  "transcript": "I cannot see the pitbore. Hold for another three seconds, maybe. Thais are okay from left, giving up a little bit, but all under control.",
+  "tone_label": "ELEVATED_AROUSAL",
+  "tone_score": 0.5972570865294106,
+  "tone_confidence": 0.5972570865294106,
+  "complaint_category": null,
+  "category_confidence": null,
+  "text_tone_disagreement": null
+}

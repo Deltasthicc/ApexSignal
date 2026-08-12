@@ -1,0 +1,10 @@
+{
+  "incident_id": "2018_Bahrain_Grand_Prix_ESTOCO01_31_20180408_182653",
+  "transcript": "So temperatures are all okay. Yeah, I'm sliding all over the place. Use torque 8 or 9, use torque 9. Use torque 8 or 9.",
+  "tone_label": "ELEVATED_AROUSAL",
+  "tone_score": 0.5733478853126379,
+  "tone_confidence": 0.5733478853126379,
+  "complaint_category": null,
+  "category_confidence": null,
+  "text_tone_disagreement": null
+}

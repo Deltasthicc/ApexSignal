@@ -1,0 +1,10 @@
+{
+  "incident_id": "2018_Australian_Grand_Prix_KIMRAI01_7_20180325_162733",
+  "transcript": "Engine 5, Kimmy, engine 5. Try to close, try to close.",
+  "tone_label": "CALM",
+  "tone_score": 0.6904922786771989,
+  "tone_confidence": 0.6904922786771989,
+  "complaint_category": null,
+  "category_confidence": null,
+  "text_tone_disagreement": null
+}

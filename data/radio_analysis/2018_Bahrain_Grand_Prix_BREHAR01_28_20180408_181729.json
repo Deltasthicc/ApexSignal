@@ -1,0 +1,10 @@
+{
+  "incident_id": "2018_Bahrain_Grand_Prix_BREHAR01_28_20180408_181729",
+  "transcript": "Please check for the left corner for damage. We can see a small aerobalance rearward, but no problem with load.",
+  "tone_label": "ELEVATED_AROUSAL",
+  "tone_score": 0.5466113692365208,
+  "tone_confidence": 0.5466113692365208,
+  "complaint_category": null,
+  "category_confidence": null,
+  "text_tone_disagreement": null
+}

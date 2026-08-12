@@ -1,0 +1,10 @@
+{
+  "incident_id": "2018_Australian_Grand_Prix_SERPER01_11_20180325_161855",
+  "transcript": "rear left temperature is now approaching our comfortable maximum rear left temperature",
+  "tone_label": "ELEVATED_AROUSAL",
+  "tone_score": 0.5291575546604765,
+  "tone_confidence": 0.5291575546604765,
+  "complaint_category": null,
+  "category_confidence": null,
+  "text_tone_disagreement": null
+}
