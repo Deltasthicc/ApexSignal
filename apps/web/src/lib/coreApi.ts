@@ -1,6 +1,7 @@
 // Thin client for services/core_api (or mock_server during early development).
 // Response shapes must match contracts/schemas/*.schema.json exactly --
 // nothing here invents a field the backend doesn't send.
+import { DEMO_FIXTURES } from "@/data/demoFixtures";
 
 export type BaselineEvidence = {
   throttle_pickup_delta_pct: number;
@@ -78,6 +79,7 @@ const BASE_URL =
 // same base; docker-compose points it separately when core_api and
 // radio_ai run as distinct containers.
 const RADIO_BASE_URL = process.env.NEXT_PUBLIC_RADIO_AI_BASE_URL ?? BASE_URL;
+const USE_EMBEDDED_FIXTURES = process.env.NEXT_PUBLIC_DATA_MODE === "embedded";
 
 async function getJson<T>(base: string, path: string): Promise<T> {
   const response = await fetch(`${base}${path}`, { cache: "no-store" });
@@ -99,20 +101,37 @@ async function postJson<T>(base: string, path: string): Promise<T> {
 }
 
 export function checkHealth(): Promise<HealthStatus> {
+  if (USE_EMBEDDED_FIXTURES) {
+    return Promise.resolve({ status: "ok", evaluate_mode: "fixture", service: "embedded_static_demo" });
+  }
   return getJson<HealthStatus>(BASE_URL, "/health");
 }
 
 export function fetchReplayManifest(): Promise<ManifestEntry[]> {
+  if (USE_EMBEDDED_FIXTURES) {
+    return Promise.resolve(DEMO_FIXTURES.manifest.map((entry) => ({ ...entry })) as ManifestEntry[]);
+  }
   return getJson<ManifestEntry[]>(BASE_URL, "/v1/replay/manifest");
 }
 
 export function fetchIncidentAssessment(
   incidentId: string
 ): Promise<IncidentAssessment> {
+  if (USE_EMBEDDED_FIXTURES) {
+    const fixture = DEMO_FIXTURES.assessments[incidentId as keyof typeof DEMO_FIXTURES.assessments];
+    if (!fixture) return Promise.reject(new Error(`No embedded assessment for ${incidentId}`));
+    return Promise.resolve({ ...fixture } as IncidentAssessment);
+  }
   return getJson<IncidentAssessment>(BASE_URL, `/v1/incidents/${incidentId}`);
 }
 
 export function analyzeRadio(incidentId: string): Promise<RadioAnalysisOutput> {
+  if (USE_EMBEDDED_FIXTURES) {
+    const fixture =
+      DEMO_FIXTURES.radio[incidentId as keyof typeof DEMO_FIXTURES.radio] ??
+      DEMO_FIXTURES.radio["INC-114"];
+    return Promise.resolve({ ...fixture, incident_id: incidentId } as RadioAnalysisOutput);
+  }
   return postJson<RadioAnalysisOutput>(
     RADIO_BASE_URL,
     `/v1/radio/analyze?incident_id=${encodeURIComponent(incidentId)}`

@@ -11,19 +11,22 @@ Brings up `radio_ai` (8002), `core_api` (8001), and `web` (3000). Set
 files once the real model/retrieval implementations are ready; both
 default to fixture mode.
 
-## Hugging Face Space (optional)
+## Hugging Face Space
 
-If time allows, package the demo as a Hugging Face Space for judge
-accessibility outside the local machine:
+The repository root is a ready-to-build Hugging Face Docker Space:
 
-- Space SDK: Docker (reuses `deployment/docker-compose.yml` services,
-  or a single combined Dockerfile if the Space only supports one
-  container).
-- Cache models and `data/` assets into the Space image at build time;
-  the judged path must not depend on external network calls at runtime.
-- Document the Space URL in `../docs/submission/project_links.md` once
-  live (see `docs/` — not yet created; add when submission docs are
-  written).
+- `Dockerfile` exports the Next.js frontend during the image build.
+- `mock_server` serves both the exported website and `/v1/*` fixture API on
+  port `7860`, so the live inspector works on the Space without Render/Vercel.
+- Circuit geometry and fixtures are baked into the image; the judged path has
+  no runtime dependency on third-party APIs.
 
-Local Docker Compose remains the demo fallback regardless of whether
-the Space deployment works.
+Local Docker Compose remains the full multi-service development path.
+
+### Free-account static fallback
+
+Free Hugging Face accounts may be restricted from creating new Docker Spaces.
+`scripts/build_static_fixtures.py` compiles the same contract fixtures into the
+browser bundle. Build with `NEXT_PUBLIC_DATA_MODE=embedded` and deploy `out/`
+as a Static Space. The UI stays fully interactive and labels the mode as a
+fixture demo; it does not claim live model execution.

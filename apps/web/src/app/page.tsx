@@ -20,6 +20,7 @@ import { LiveInspector } from "@/components/LiveInspector";
 import { EvidenceStory } from "@/components/EvidenceStory";
 import { ScopeSection } from "@/components/ScopeSection";
 import { MaterialsSection, TeamSection } from "@/components/MaterialsTeam";
+import { CircuitAtlasSection } from "@/components/CircuitAtlas";
 
 type Loadable<T> = T | "loading" | "error";
 
@@ -105,6 +106,8 @@ export default function PitWallPage() {
       />
 
       <PipelineSection />
+
+      <CircuitAtlasSection />
 
       {Array.isArray(entries) && entries.length > 0 && (
         <SessionGrid

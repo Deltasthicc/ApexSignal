@@ -80,6 +80,24 @@ body {
   animation: draw-line 2.4s ease-out forwards;
 }
 
+.circuit-draw,
+.circuit-card-line {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw-line 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.circuit-card-line {
+  animation-duration: 1.25s;
+  transition: stroke 180ms ease, filter 180ms ease;
+}
+
+button:hover .circuit-card-line,
+button[aria-pressed="true"] .circuit-card-line {
+  stroke: #e10600;
+  filter: drop-shadow(0 0 5px rgba(225, 6, 0, 0.45));
+}
+
 @keyframes radar-ping {
   0% {
     transform: scale(0.5);
@@ -129,4 +147,25 @@ body {
 }
 .bounce-y {
   animation: bounce-y 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .circuit-draw,
+  .circuit-card-line,
+  .hero-line {
+    stroke-dashoffset: 0;
+  }
 }

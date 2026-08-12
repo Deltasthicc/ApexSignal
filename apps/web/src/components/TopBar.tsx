@@ -2,6 +2,7 @@
 
 const LINKS = [
   { href: "#pipeline", label: "how it works" },
+  { href: "#circuits", label: "circuits" },
   { href: "#sessions", label: "demo incidents" },
   { href: "#live", label: "live inspector" },
   { href: "#evidence", label: "evidence" },

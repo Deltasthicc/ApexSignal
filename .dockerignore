@@ -1,0 +1,17 @@
+.git
+.github
+.scratch_preview
+**/.next
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+**/*.pyc
+**/*.log
+storage
+hf_dataset
+services
+data
+data_pipeline
+tests
+docs
+deployment

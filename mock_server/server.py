@@ -8,10 +8,12 @@ this server alone.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="ApexSignal mock_server")
 
@@ -78,3 +80,10 @@ def replay_manifest() -> list:
     to probe /v1/replay/frame one index at a time. Additive convenience
     endpoint -- same underlying fixture data as /v1/replay/frame."""
     return _load("incident_manifest.sample.json")
+
+
+# Hugging Face Space mode: serve the exported Next.js site and the fixture API
+# from one origin. Mount this last so /health and /v1/* keep route priority.
+STATIC_SITE_DIR = Path(os.getenv("STATIC_SITE_DIR", ""))
+if STATIC_SITE_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=STATIC_SITE_DIR, html=True), name="frontend")

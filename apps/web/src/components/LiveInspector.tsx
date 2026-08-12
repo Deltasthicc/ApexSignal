@@ -56,6 +56,7 @@ export function LiveInspector({
     : null;
   const selectedAssessment = selectedId ? assessmentCache[selectedId] : undefined;
   const selectedRadio = selectedId ? radioCache[selectedId] : undefined;
+  const embeddedDemo = process.env.NEXT_PUBLIC_DATA_MODE === "embedded";
 
   return (
     <section id="live" className="border-t border-rule bg-bg2 px-6 py-24">
@@ -66,10 +67,15 @@ export function LiveInspector({
             The pit-wall incident inspector
           </h2>
           <p className="mt-3 max-w-2xl text-[12.5px] leading-relaxed text-dim">
-            Real requests against{" "}
-            <code className="text-teal">{process.env.NEXT_PUBLIC_CORE_API_BASE_URL}</code>{" "}
-            — click a pin, read the evidence, toggle Pit Wall View to see what
-            changes.
+            {embeddedDemo ? (
+              <>Interactive contract fixtures are embedded in this public Hugging Face build</>
+            ) : (
+              <>
+                Real requests against{" "}
+                <code className="text-teal">{process.env.NEXT_PUBLIC_CORE_API_BASE_URL}</code>
+              </>
+            )}{" "}
+            — click a pin, read the evidence, toggle Pit Wall View to see what changes.
           </p>
         </Reveal>
 

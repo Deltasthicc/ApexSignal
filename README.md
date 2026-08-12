@@ -1,3 +1,14 @@
+---
+title: ApexSignal
+emoji: 🏁
+colorFrom: red
+colorTo: gray
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
+
 # ApexSignal
 
 **The Silent Co-Driver — evidence-driven incident memory for the F1 pit wall.**

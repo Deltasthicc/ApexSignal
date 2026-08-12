@@ -5,6 +5,7 @@ import { analyzeRadio, type RadioAnalysisOutput } from "@/lib/coreApi";
 import { CategoryBadge, ConfidencePill, ToneBadge } from "@/components/Badge";
 
 export function UploadPanel() {
+  const embeddedDemo = process.env.NEXT_PUBLIC_DATA_MODE === "embedded";
   const [fileName, setFileName] = useState<string | null>(null);
   const [state, setState] = useState<"idle" | "loading" | "error">("idle");
   const [result, setResult] = useState<RadioAnalysisOutput | null>(null);
@@ -43,10 +44,11 @@ export function UploadPanel() {
       </label>
 
       <p className="mt-3 text-[10px] leading-relaxed text-dim">
-        Demo mode: the connected backend returns a representative
-        radio_ai-shaped analysis rather than transcribing the uploaded audio.
-        Point <code className="text-teal">NEXT_PUBLIC_CORE_API_BASE_URL</code>{" "}
-        at a live services/radio_ai instance for real transcription.
+        {embeddedDemo ? (
+          <>Static judge mode: selecting a file exercises the complete UI with a representative contract-fixture response. The browser does not upload your file or claim to transcribe it.</>
+        ) : (
+          <>Demo mode: the connected backend returns a representative radio_ai-shaped analysis rather than transcribing the uploaded audio. Point <code className="text-teal">NEXT_PUBLIC_CORE_API_BASE_URL</code> at a live services/radio_ai instance for real transcription.</>
+        )}
       </p>
 
       {state === "loading" && (

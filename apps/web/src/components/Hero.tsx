@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Reveal } from "@/components/Reveal";
+import { CircuitBackdrop, CircuitSignalGraphic } from "@/components/CircuitAtlas";
 
 export function Hero({
   sessionId,
@@ -37,6 +38,7 @@ export function Hero({
         backgroundSize: "34px 34px",
       }}
     >
+      <CircuitBackdrop />
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
         <div>
           <p className="label-red mb-4">
@@ -86,7 +88,7 @@ export function Hero({
             <Stat k="Session" v={sessionId} />
             <Stat k="Driver" v={driver} />
             <Stat k="Incidents" v={incidentCount === null ? "—" : String(incidentCount)} />
-            <Stat k="Mode" v={modeLabel} accent />
+            <Stat k="Mode" v={modeLabel === "fixture" ? "fixture demo" : modeLabel} accent />
           </div>
         </div>
 
@@ -115,16 +117,16 @@ export function Hero({
               onEnded={() => setPlaying(false)}
             />
 
-            <HeroGraphic playing={playing} />
+            <CircuitSignalGraphic playing={playing} />
 
             <div className="mt-3 flex flex-wrap items-center justify-between gap-x-5 gap-y-2 border-t border-rule pt-3 text-[9px] uppercase tracking-[0.14em] text-dim">
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <Legend color="bg-red" label="Radio call" />
-                <Legend color="bg-ink/60" label="Telemetry baseline" />
+                <Legend color="bg-ink/60" label="Source centerline" />
                 <Legend color="bg-gold" label="Deviation confirmed" />
               </div>
               <span className={playing ? "text-red" : ""}>
-                {playing ? "now playing…" : "not a demo incident — just for fun"}
+                {playing ? "now playing…" : "illustrative radio clip · not fixture evidence"}
               </span>
             </div>
           </div>
@@ -179,156 +181,5 @@ function Legend({ color, label }: { color: string; label: string }) {
       <span className={`h-1.5 w-1.5 rounded-full ${color}`} />
       {label}
     </span>
-  );
-}
-
-// Mirrored waveform bar heights -- deterministic (no Math.random, so
-// server/client render match) but irregular enough to read as audio,
-// tallest right at the radio-call marker for visual emphasis.
-const BAR_HEIGHTS = [7, 11, 9, 16, 12, 20, 15, 26, 30, 22, 14, 9, 12, 8, 6];
-const CALL_BAR_INDEX = 7; // the tall spike -- "the moment of the call"
-
-export function HeroGraphic({ playing = false }: { playing?: boolean }) {
-  const barGap = 30;
-  const firstBarX = 40;
-  const waveCenterY = 55;
-  const callX = firstBarX + CALL_BAR_INDEX * barGap;
-
-  const baselineY = 210;
-  const deviationY = 255;
-  const deviationX = 330;
-
-  return (
-    <svg
-      viewBox="0 0 520 320"
-      className="w-full"
-      role="img"
-      aria-label="A driver's radio call, followed three laps later by a measurable telemetry deviation the system connects back to it"
-    >
-      {/* ── audio waveform ─────────────────────────────── */}
-      <line
-        x1="30" y1={waveCenterY} x2="490" y2={waveCenterY}
-        stroke="#1e1e1e" strokeWidth="1" strokeDasharray="2 4"
-      />
-      {BAR_HEIGHTS.map((h, i) => {
-        const x = firstBarX + i * barGap;
-        const isCall = i === CALL_BAR_INDEX;
-        return (
-          <rect
-            key={i}
-            className="audio-bar"
-            x={x - 3}
-            y={waveCenterY - h}
-            width="6"
-            height={h * 2}
-            rx="2"
-            fill={isCall ? "#e10600" : playing ? "#e10600b0" : "#e1060080"}
-            style={{
-              animationDelay: `${i * 70}ms`,
-              animationDuration: playing ? "0.45s" : "1.1s",
-              transformOrigin: `${x}px ${waveCenterY}px`,
-            }}
-          />
-        );
-      })}
-
-      <circle
-        cx={callX}
-        cy={waveCenterY}
-        r="5"
-        className="radar-ping fill-red/40"
-        style={{ animationDuration: playing ? "1s" : "2.2s" }}
-      />
-      <text
-        x={callX} y={waveCenterY + 34}
-        textAnchor="middle"
-        className="fill-ink"
-        style={{ fontSize: "10px", letterSpacing: "0.12em" }}
-      >
-        RADIO CALL
-      </text>
-      <text
-        x={callX} y={waveCenterY + 47}
-        textAnchor="middle"
-        className="fill-dim"
-        style={{ fontSize: "9px", letterSpacing: "0.1em" }}
-      >
-        LAP 14
-      </text>
-
-      {/* ── signal -> telemetry connector, with a traveling pulse ── */}
-      <path
-        id="hero-connector"
-        d={`M ${callX} ${waveCenterY + 14} C ${callX} 150, ${deviationX - 60} 150, ${deviationX} ${deviationY - 16}`}
-        stroke="#e1060055"
-        strokeWidth="1.2"
-        strokeDasharray="3 4"
-        fill="none"
-      />
-      <circle r="3.5" fill="#e10600">
-        <animateMotion dur="2.6s" repeatCount="indefinite" rotate="auto">
-          <mpath href="#hero-connector" xlinkHref="#hero-connector" />
-        </animateMotion>
-      </circle>
-      <text
-        x={(callX + deviationX) / 2 + 30} y="150"
-        textAnchor="middle"
-        className="fill-red"
-        style={{ fontSize: "9.5px", letterSpacing: "0.1em" }}
-      >
-        LEAD TIME 189.4S
-      </text>
-
-      {/* ── telemetry baseline, deviating at the second call ──── */}
-      <line
-        x1="30" y1={baselineY} x2="490" y2={baselineY}
-        stroke="#1e1e1e" strokeWidth="1" strokeDasharray="2 4"
-      />
-      <path
-        d={`M 30 ${baselineY} L ${deviationX - 40} ${baselineY} C ${deviationX - 15} ${baselineY}, ${deviationX - 15} ${deviationY}, ${deviationX + 10} ${deviationY} L 490 ${deviationY}`}
-        stroke="#00d2be"
-        strokeWidth="1.8"
-        fill="none"
-        className="hero-line"
-      />
-      <circle cx={deviationX + 10} cy={deviationY} r="4.5" fill="#ffd60a" />
-      <text
-        x={deviationX + 10} y={deviationY + 24}
-        textAnchor="middle"
-        className="fill-ink"
-        style={{ fontSize: "10px", letterSpacing: "0.1em" }}
-      >
-        MEASURABLE DEVIATION
-      </text>
-      <text
-        x={deviationX + 10} y={deviationY + 37}
-        textAnchor="middle"
-        className="fill-dim"
-        style={{ fontSize: "9px", letterSpacing: "0.1em" }}
-      >
-        LAP 17
-      </text>
-
-      {/* ── lap axis ───────────────────────────────────── */}
-      {[
-        [40, "L10"],
-        [callX, "L14"],
-        [deviationX + 10, "L17"],
-        [430, "L22"],
-      ].map(([x, label]) => (
-        <g key={label as string}>
-          <line x1={x} y1="298" x2={x} y2="303" stroke="#4a4a4a" strokeWidth="1" />
-          <text
-            x={x} y="315"
-            textAnchor="middle"
-            className="fill-dim"
-            style={{ fontSize: "9px", letterSpacing: "0.06em" }}
-          >
-            {label}
-          </text>
-        </g>
-      ))}
-      <line x1="30" y1="298" x2="490" y2="298" stroke="#1e1e1e" strokeWidth="1" />
-    </svg>
   );
 }
