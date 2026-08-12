@@ -1,0 +1,10 @@
+# Deliberately without FastF1.
+#
+# The window rules, the column mapping and the clock check are all tested
+# against synthetic frames, so CI never downloads a session and the suite
+# cannot start passing or failing because of network weather. If a test
+# ever needs FastF1 installed, that test is reaching too far.
+pandas>=2.0
+numpy>=1.24
+pyarrow>=14.0
+pytest>=8.0

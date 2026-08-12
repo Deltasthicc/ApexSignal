@@ -1,0 +1,8 @@
+# Workstream A — dataset curation and telemetry windows.
+# Needed only to *build* windows from a FastF1 session. Reading and
+# validating an already-built window does not require FastF1; see
+# requirements-test.txt.
+fastf1>=3.3
+pandas>=2.0
+numpy>=1.24
+pyarrow>=14.0
