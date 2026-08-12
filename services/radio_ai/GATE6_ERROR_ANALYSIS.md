@@ -102,10 +102,42 @@ exception, which is exactly pattern 2's problem, now made worse across
 the board rather than fixed for pattern 1 alone.
 
 **Conclusion: keep the baseline template and `NULL_THRESHOLD=0.15`.**
-Fixing the two patterns for real likely needs per-category label
-descriptions tuned individually (not one global template swap), a
-hierarchical gate (detect "is there a complaint at all" separately
-from "which category"), or more labeled data before either is worth
-trusting -- not a quick template edit. Recorded here so this exact
-negative result doesn't get re-discovered by re-running the same
-experiment later.
+Recorded here so this exact negative result doesn't get re-discovered
+by re-running the same experiment later.
+
+## Experiment: hierarchical gate (tested, also rejected)
+
+Second candidate fix: split into (1) binary "is this a complaint at
+all?" (single-label softmax over 2 options, not independent multi_label
+scores) then (2) "which of the 5 categories?" only if stage 1 says yes.
+Theory: a genuine either/or decision at stage 1 should be more decisive
+than 6 independent entailment scores all fighting the same 0.15
+threshold. Tested against the same 58 examples
+(`scripts/experiment_hierarchical_gate.py`).
+
+**Result: rejected, also a regression.** macro-F1 = 0.242 vs. baseline
+0.356 (**-11.4pp**), accuracy 44.8%. Stage 1 alone got complaint/no-complaint
+wrong on 24/58 (41%) -- and not randomly: forcing a binary choice made
+the model *more* confident about "complaint" on informational lines
+mentioning any mechanical/positional content, not less:
+
+```
+true=NO_COMPLAINT  stage1_said_complaint=True  score=0.995  'We think Verstappen has some damage.'
+true=NO_COMPLAINT  stage1_said_complaint=True  score=0.999  'Sebastian, we need to retire the car in the garage. So, box '
+true=NO_COMPLAINT  stage1_said_complaint=True  score=0.989  'Two cars ahead, older tyres. Safety car is entering the pit '
+```
+
+Removing NO_COMPLAINT's ability to compete as an independent score
+(as it does in the current multi_label setup) removed the one thing
+that was actually helping it win on exactly this kind of sentence.
+Splitting the decision made the context-blindness problem worse, not
+better -- the opposite of the theory.
+
+**Both candidate fixes for the two error patterns have now been tried
+and both made things worse.** Current best-known configuration is
+still: single-pass `multi_label=True`, baseline hypothesis template,
+`NULL_THRESHOLD=0.15`. Next things worth trying if this gate gets
+revisited: per-category label descriptions tuned individually (not one
+global template/structure change), or simply more labeled data --
+n=58 with 44/58 being one class is a thin basis for any of these
+changes to generalize confidently either way.

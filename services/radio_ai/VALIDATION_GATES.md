@@ -34,7 +34,7 @@ letting a tone score silently reflect the wrong (or a blended) voice.
 
 | Gate | Threshold | Result | Verdict |
 |---|---|---|---|
-| 0.5. Every demo-critical clip is single-speaker (driver-dominant) | Yes/No, per clip | | |
+| 0.5. Every demo-critical clip is single-speaker (driver-dominant) | Yes/No, per clip | Not a per-clip yes/no yet — that's still a human listening call. Built a triage helper instead (`scripts/flag_multispeaker_candidates.py`, output in `gate0.5_multispeaker_triage.txt`): counts VAD speech-segment gaps ≥0.3s as a cheap proxy for possible turn-taking. **Not diarization** — it has no idea who's speaking, only how speech is chunked in time. 10/20 clips flagged; `MAXVER01_33_163337` came out #1 (7 segments) — matches this doc's own by-ear example of a confirmed mixed-speaker clip, which is a real (if small) validation the heuristic carries signal. | PENDING — use the triage list to prioritize which clips to double-check by ear, still your call per clip |
 
 ## Gate 1 — ASR quality (meaning-critical, not raw WER)
 
