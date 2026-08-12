@@ -111,7 +111,7 @@ export function Hero({
             </button>
             <audio
               ref={audioRef}
-              src="/audio/lando-norris-fp1-tuscany.mp3"
+              src="https://raw.githubusercontent.com/Deltasthicc/ApexSignal/main/apps/web/public/audio/lando-norris-fp1-tuscany.mp3"
               onPlay={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
               onEnded={() => setPlaying(false)}

@@ -5,7 +5,7 @@ import { analyzeRadio, type RadioAnalysisOutput } from "@/lib/coreApi";
 import { CategoryBadge, ConfidencePill, ToneBadge } from "@/components/Badge";
 
 export function UploadPanel() {
-  const embeddedDemo = process.env.NEXT_PUBLIC_DATA_MODE === "embedded";
+  const embeddedDemo = process.env.NEXT_PUBLIC_DATA_MODE !== "remote";
   const [fileName, setFileName] = useState<string | null>(null);
   const [state, setState] = useState<"idle" | "loading" | "error">("idle");
   const [result, setResult] = useState<RadioAnalysisOutput | null>(null);

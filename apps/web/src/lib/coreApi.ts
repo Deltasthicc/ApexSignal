@@ -79,7 +79,7 @@ const BASE_URL =
 // same base; docker-compose points it separately when core_api and
 // radio_ai run as distinct containers.
 const RADIO_BASE_URL = process.env.NEXT_PUBLIC_RADIO_AI_BASE_URL ?? BASE_URL;
-const USE_EMBEDDED_FIXTURES = process.env.NEXT_PUBLIC_DATA_MODE === "embedded";
+const USE_EMBEDDED_FIXTURES = process.env.NEXT_PUBLIC_DATA_MODE !== "remote";
 
 async function getJson<T>(base: string, path: string): Promise<T> {
   const response = await fetch(`${base}${path}`, { cache: "no-store" });

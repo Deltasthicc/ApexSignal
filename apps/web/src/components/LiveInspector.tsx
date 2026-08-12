@@ -56,7 +56,7 @@ export function LiveInspector({
     : null;
   const selectedAssessment = selectedId ? assessmentCache[selectedId] : undefined;
   const selectedRadio = selectedId ? radioCache[selectedId] : undefined;
-  const embeddedDemo = process.env.NEXT_PUBLIC_DATA_MODE === "embedded";
+  const embeddedDemo = process.env.NEXT_PUBLIC_DATA_MODE !== "remote";
 
   return (
     <section id="live" className="border-t border-rule bg-bg2 px-6 py-24">
