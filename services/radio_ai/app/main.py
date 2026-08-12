@@ -17,8 +17,9 @@ from fastapi import FastAPI, UploadFile
 
 from app import asr, complaint_classifier, tone
 from app.audio_preprocessing import preprocess
-from app.config import ModelConfig
 from app.models import RadioAnalysisOutput
+from app.output_store import write_radio_analysis
+from app.pipeline import run_live_pipeline
 
 logger = logging.getLogger("radio_ai")
 
@@ -56,6 +57,13 @@ async def analyze(incident_id: str, audio: UploadFile | None = None) -> RadioAna
     so every downstream consumer can be built before models are wired
     up. ANALYZE_MODE=live runs the real ASR -> tone -> classification
     pipeline; requires `audio` to be supplied.
+
+    In live mode, the result is also written to disk as
+    {incident_id}.json under RADIO_ANALYSIS_OUTPUT_DIR (default
+    data/radio_analysis/) -- core_api reads from there directly rather
+    than calling this endpoint, so calling this endpoint is not the
+    only way output reaches core_api. See contracts/api_contract.md,
+    "Output location." Fixture mode never writes to shared disk state.
     """
     mode = os.environ.get("ANALYZE_MODE", "fixture")
     if mode == "fixture":
@@ -71,31 +79,6 @@ async def analyze(incident_id: str, audio: UploadFile | None = None) -> RadioAna
         tmp.flush()
         waveform = preprocess(tmp.name)
 
-    transcript, asr_model_used = asr.transcribe(waveform)
-    logger.info("asr model used: %s", asr_model_used)
-
-    tone_scores = tone.score_waveform(waveform)
-    tone_label, tone_score, tone_confidence = tone.map_to_label(tone_scores)
-
-    complaint_category, category_confidence = complaint_classifier.classify(transcript)
-
-    payload = {
-        "incident_id": incident_id,
-        "transcript": transcript,
-        "tone_label": tone_label,
-        "tone_score": tone_score,
-        "tone_confidence": tone_confidence,
-        "complaint_category": complaint_category,
-        "category_confidence": category_confidence,
-    }
-    if ModelConfig.ENABLE_TEXT_TONE_DISAGREEMENT:
-        # Deliberately not implemented until the Day-1 acoustic gate
-        # passes -- see VALIDATION_GATES.md gate 5. Wire in the
-        # semantic-concern vs. arousal comparison here once it does.
-        raise NotImplementedError(
-            "ENABLE_TEXT_TONE_DISAGREEMENT is on but the comparison logic "
-            "isn't implemented. Do not flip this flag before the Day-1 "
-            "gate passes and the comparison is built."
-        )
-
-    return RadioAnalysisOutput.model_validate(payload)
+    result = run_live_pipeline(waveform, incident_id)
+    write_radio_analysis(result)
+    return result

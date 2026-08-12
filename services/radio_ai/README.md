@@ -35,6 +35,17 @@ No prototype set to build, no cosine threshold to hand-tune, no
 aggregation rule to invent for edge cases. See `app/config.py`'s
 `ClassifierConfig.TAXONOMY` for the exact wording in use.
 
+**Known limitation: mixed speakers, no diarization.** Clips in
+`MikCil/f1-team-radio` mix engineer and driver voices (confirmed in
+our own extracted samples — e.g. the MAXVER01 status-update clip is a
+back-and-forth exchange). Neither the ASR nor the tone stage separates
+speakers, so a mixed clip's transcript and tone score can reflect the
+wrong voice or a blend of both. There's no time to build real
+diarization before submission; the mitigation is curation, not code —
+see `VALIDATION_GATES.md` gate 0.5. Pick driver-dominant clips for
+anything demo-critical, and say so explicitly if a clip has real
+overlap rather than letting the tone score imply it's clean.
+
 **Dataset provenance caveat:** `MikCil/f1-team-radio`'s CC-BY-4.0 tag is
 the uploader's license choice; the same card credits Formula 1 for the
 original broadcasts. Use it freely for development and benchmarking.

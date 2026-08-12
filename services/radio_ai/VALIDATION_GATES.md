@@ -19,6 +19,23 @@ no exception. This is a smoke test, not a quality check.
 
 **Note on tone scores (Gate 2 will need this):** the VoiceCLAP `AttributeScorer`'s raw dimensions are not bounded to `[0,1]` the way `ToneThresholds` assumes — observed `Arousal` values of 1.60 and 2.72 on these 3 clips, well past `AROUSAL_ELEVATED_THRESHOLD=0.6`. `tone.map_to_label()` clamps the returned `tone_score` to `[0,1]`, so any clip with `Arousal > 1` collapses to an identical `tone_score=1.0, tone_confidence=1.0` — no resolution above that point. Gate 2b's Spearman correlation must be computed against the raw `Arousal` value in `tone_raw_scores`, not the clamped `tone_score`, or it will be meaningless. (Note written when `AROUSAL_ELEVATED_THRESHOLD` was still 0.6 — see gate 2a below for the recalibration to 2.565. The clamping behavior itself is unchanged either way.)
 
+## Gate 0.5 — single-speaker check (do this while listening for gate 2)
+
+`MikCil/f1-team-radio` mixes engineer and driver voices within a single
+clip (confirmed both in the dataset's own sourcing notes and directly
+in our own extracted samples — the MAXVER01 status-update clip has
+both). Neither `asr.py` nor `tone.py` does speaker separation. There's
+no time to build real diarization before submission, so the mitigation
+is curation, not code: when picking clips, prefer ones where the
+**driver** is speaking for most/all of the clip's duration, and reject
+or trim ones that are mostly back-and-forth dialogue. If a demo-critical
+clip has real driver+engineer overlap, say so explicitly rather than
+letting a tone score silently reflect the wrong (or a blended) voice.
+
+| Gate | Threshold | Result | Verdict |
+|---|---|---|---|
+| 0.5. Every demo-critical clip is single-speaker (driver-dominant) | Yes/No, per clip | | |
+
 ## Gate 1 — ASR quality (meaning-critical, not raw WER)
 
 Manually correct the transcript for each benchmarked clip yourself; the

@@ -13,28 +13,35 @@
    computes lead time where the data supports it.
 5. core_api emits one IncidentAssessment object.
 6. apps/web renders one incident card and advances the replay timeline.
-7. core_api continues telemetry-only recurrence scanning in the
-   background, independent of new radio events.
 ```
 
-Two flows share this pipeline:
+One flow, not two independent ones -- this is a deliberate correction
+from the original charter (see `docs/PROJECT_CHARTER.md`'s "Flow B"),
+which described a standing background process that scans telemetry for
+recurrence independent of new radio events. That's out of scope for
+this build: ApexSignal cannot flag a recurrence before the driver
+reports something again. What it does instead:
 
-- **Flow A, incident capture:** radio event -> transcript/tone -> complaint
-  category -> telemetry context -> historical retrieval -> incident stored.
-- **Flow B, recurrence monitoring:** new telemetry window -> compare against
-  stored incident fingerprints -> flag possible recurrence -> surface prior
-  radio context -> wait for later radio/telemetry to strengthen or weaken
-  the hypothesis.
+- **Incident capture:** radio event -> transcript/tone -> complaint
+  category -> telemetry context -> historical retrieval -> incident
+  stored.
+- **Recurrence recognition:** when a *new* radio event arrives, its
+  telemetry window is compared against stored incident fingerprints
+  as part of that same evaluation. If it resembles a prior incident,
+  `recurrence_state` is set to `POSSIBLE_RECURRENCE` and the prior
+  incident surfaces as `echo_match`. The driver's own restated
+  complaint is what triggers this check, not an independent scan.
 
-Flow B is why the product can claim early warning rather than just
-after-the-fact tagging.
+Don't describe this in the pitch/demo as catching a recurrence *before*
+the driver's second radio call -- it can't. It recognizes one faster
+once they've called it in again, with evidence attached.
 
 ## Service boundaries
 
 | Service | Owns | Talks to |
 |---|---|---|
 | `services/radio_ai` | ASR, tone/arousal, complaint classification | Nothing else. Stateless. Takes audio, returns `RadioAnalysisOutput`. |
-| `services/core_api` + `services/evidence_memory` | Incident storage, retrieval, evidence fusion, recurrence monitor | Calls `radio_ai` over HTTP. Reads `data/` telemetry windows. Owns `storage/`. |
+| `services/core_api` + `services/evidence_memory` | Incident storage, retrieval, evidence fusion, recurrence recognition | Calls `radio_ai` over HTTP. Reads `data/` telemetry windows. Owns `storage/`. |
 | `apps/web` | Pit-Wall Incident Inspector UI | Calls `core_api` (or `mock_server` during independent development). |
 | `mock_server` | Fixture-backed stand-in for `core_api` + `radio_ai` | Serves `contracts/fixtures/*` verbatim. |
 | `data_pipeline` | Offline dataset curation, FastF1 caching, replay asset generation | Not called at runtime. Produces files consumed by `core_api` and the replay driver. |
