@@ -1,0 +1,24 @@
+# Render Blueprint for the ApexSignal backend judges can hit publicly.
+#
+# Only mock_server is deployed here on purpose: it's the lightweight,
+# fixture-backed service (no torch/sentence-transformers/faiss, no
+# persistent-filesystem requirement), so it builds fast and fits
+# comfortably in Render's free tier. core_api and radio_ai need a
+# writable persistent disk / GPU-class dependencies respectively and
+# are NOT suitable for this free-tier path -- run those locally per
+# the root README if you want the "live" (non-fixture) pipeline.
+#
+# Deploy: https://dashboard.render.com/blueprints -> New Blueprint
+# Instance -> point at this repo. Render reads this file automatically.
+
+services:
+  - type: web
+    name: apexsignal-mock-server
+    runtime: docker
+    dockerfilePath: ./mock_server/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8000
