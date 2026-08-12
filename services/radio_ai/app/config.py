@@ -168,5 +168,9 @@ class ClassifierConfig:
         "VISIBILITY_TRACK_CONDITION",
     ]
 
-    # NEEDS_CALIBRATION from the Day-2 60-90 example benchmark.
-    NULL_THRESHOLD = float(os.environ.get("CLASSIFIER_NULL_THRESHOLD", "0.5"))
+    # Calibrated from the Gate 6 benchmark (58 human-labeled transcripts,
+    # see VALIDATION_GATES.md gate 6): swept 0.05-0.60 against real
+    # labels, 0.15 was the genuine best point (macro-F1 0.356 vs 0.326
+    # at the old 0.5 default). n=58, one dataset -- revisit as more
+    # labeled transcripts accumulate, same caveat as the tone thresholds.
+    NULL_THRESHOLD = float(os.environ.get("CLASSIFIER_NULL_THRESHOLD", "0.15"))

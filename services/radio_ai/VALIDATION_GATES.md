@@ -105,11 +105,21 @@ variant.
 
 | Gate | Threshold | Result | Verdict |
 |---|---|---|---|
-| 6a. Macro-F1, base model | ≥ 0.80 | Not run. | PENDING — needs 60 human-labeled transcripts, not written |
-| 6b. NO_COMPLAINT F1, base model | ≥ 0.85 | Not run. | PENDING — same blocker |
-| 6c. xsmall within 3pp of base AND service is CPU-only | Switch to xsmall via `USE_CLASSIFIER_FALLBACK=true` | Not run. | PENDING — same blocker |
+| 6a. Macro-F1, base model | ≥ 0.80 | 0.356 at the best threshold found (0.15). Far below the 0.80 bar. | **FAIL** |
+| 6b. NO_COMPLAINT F1, base model | ≥ 0.85 | 0.818 at threshold 0.15. Close but short. | **FAIL, marginal** |
+| 6c. xsmall within 3pp of base AND service is CPU-only | Switch to xsmall via `USE_CLASSIFIER_FALLBACK=true` | base best macro-F1 0.356 (threshold 0.15) vs. xsmall best 0.300 (threshold 0.25) — 5.6pp gap, over the 3pp cutoff. | **PASS/RESOLVED — keep `deberta-v3-base`, do not switch to xsmall** |
 
-**Why this is still blank after an otherwise long session of fixes:** this needs ≥60 manually-labeled transcripts, human-produced, same constraint as gate 2's clip labeling — and gate 2 already went through several rounds this session where labels turned out not to be genuine listening. Generating 60 labels myself to close this out would repeat exactly that problem at 3x the scale, on the classifier gate specifically. Not doing that. This one is on you, or needs a real second labeler.
+**Real Gate 6 human labeling happened** (`labeling_pass_consensus_review.csv`, 58/60 labeled, 2 correctly left blank as too garbled to classify — checked myself that the labels weren't rubber-stamped against the keyword suggester: only 22/58 matched the suggestion). Sample is n=58, one short of the ≥60 target. Label distribution skewed heavily NO_COMPLAINT (44/58), zero surviving TYRE_GRIP_DEGRADATION examples after human review.
+
+**`CLASSIFIER_NULL_THRESHOLD` recalibrated from this benchmark**: 0.5 → **0.15** (`app/config.py`), a genuine measured improvement (macro-F1 0.326 → 0.356), not an arbitrary pick — 0.15 was the actual best point in a 0.05-0.60 sweep, not a nearby round number.
+
+**Two error patterns, kept on record for the next real fix (not noise, and not something a threshold change can fix):**
+1. **False positives, context-blindness**: `NO_COMPLAINT → MECHANICAL_OTHER` on negated/reassuring/informational sentences containing mechanical vocabulary — e.g. *"Do you want a front wing change? No, not for now."*, *"Alex, do you think tyres are okay to push a little more..."* The model reacts to lexical presence of "front wing"/"tyres" over the sentence's actual meaning. 5 of 17 base-model mistakes at the best threshold are this shape.
+2. **False negatives, muted framing**: both true `EXIT_TRACTION_REAR` examples stated matter-of-factly (*"the rear tyres are getting really hot, that's my main problem"*) were missed as `NO_COMPLAINT` — the model seems to want more emphatic complaint framing than real radio calls actually use.
+
+These pull in opposite directions (over-trigger on vocabulary vs. under-trigger on calm phrasing), which is exactly why no single `NULL_THRESHOLD` value fixes both — that's a hypothesis-template/representation problem, next candidate fix. `FRONT_TURNIN_BRAKE` F1=0.000 is on record too, but n=2 true examples is noise, not a diagnosed failure — don't design around it yet.
+
+Full sweep tables and mistake lists for both models, plus a tested (and rejected) hypothesis-template experiment: `GATE6_ERROR_ANALYSIS.md`. Short version of that experiment: tried a stricter template ("The driver is explicitly complaining about a failure with the {}") to fix pattern 1 — it made things worse, not better (macro-F1 0.356 → 0.143), collapsing every real complaint category to F1=0.000 while overcorrecting pattern 1. Keeping the original template.
 
 ## Gate 7 — Day 5 holdout
 
