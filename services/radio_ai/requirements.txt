@@ -6,11 +6,13 @@ python-multipart>=0.0.9
 
 # ASR: faster-whisper (CTranslate2 runtime), loads distil-whisper/distil-large-v3.5-ct2
 faster-whisper>=1.0
+nvidia-cublas-cu12  # ctranslate2's GPU path needs libcublas.so.12 even on a CUDA-13 torch install
 
 # Acoustic tone: VoiceCLAP encoder + attribute heads (transformers + torchaudio)
 transformers>=4.44
 torch>=2.3
 torchaudio>=2.3
+torchcodec>=0.10  # torchaudio.load() delegates to this since torchaudio 2.9+; missing it fails at decode time, not import time
 soundfile>=0.12
 
 # Complaint classifier: DeBERTa v3 zero-shot NLI (sentencepiece tokenizer)

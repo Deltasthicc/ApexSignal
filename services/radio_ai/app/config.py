@@ -82,22 +82,33 @@ class ModelConfig:
 class ToneThresholds:
     """Arousal/fatigue -> {CALM, ELEVATED_AROUSAL, FATIGUED} mapping.
 
-    VoiceCLAP's own model card warns against thresholding raw regression
-    scores without domain calibration. These starting points come from
-    the head-level validation stats published in the attribute-heads
-    config (Arousal r=0.82, Fatigue_Exhaustion r=0.48 on the model's own
-    eval set, not on F1 radio) and MUST be recalibrated from the Day-1
-    human-labeled sample before they're trusted for anything but a smoke
-    test. Do not ship these unchanged past Day 1.
+    Recalibrated from the Day-1 human-labeled sample (20 real F1 radio
+    clips, see VALIDATION_GATES.md gate 2/3) -- the original 0.6/0.7
+    starting guesses were carried over from VoiceCLAP's own eval-set
+    stats (Arousal r=0.82, Fatigue_Exhaustion r=0.48), not this domain,
+    and turned out to be badly miscalibrated: every one of the 20 real
+    clips scored Arousal > 0.6, so the pipeline called almost everything
+    "elevated" regardless of how it actually sounded (gate 2a: 40%
+    agreement). n=20 is still small and this is one dataset/era of F1
+    radio -- re-check this threshold as more labeled clips accumulate,
+    don't treat it as final.
     """
 
-    # NEEDS_CALIBRATION: starting guess only.
+    # Grid-searched against 20 human CALM/ELEVATED_AROUSAL labels to
+    # maximize agreement -- 85% (17/20) across a 2.55-2.58 plateau, see
+    # VALIDATION_GATES.md gate 2a. Was 0.6, which scored 40%.
     AROUSAL_ELEVATED_THRESHOLD = float(
-        os.environ.get("AROUSAL_ELEVATED_THRESHOLD", "0.6")
+        os.environ.get("AROUSAL_ELEVATED_THRESHOLD", "2.565")
     )
-    # NEEDS_CALIBRATION: fatigue is the least-validated head (r=0.48).
-    # Bias toward precision, not recall -- see charter risk register.
-    FATIGUE_THRESHOLD = float(os.environ.get("FATIGUE_THRESHOLD", "0.7"))
+    # NEEDS_CALIBRATION STILL: none of the 20 Day-1 clips were actually
+    # fatigued, so this sample has zero true positives to calibrate
+    # against -- raising it to 1.1 only clears the 2 known false
+    # positives at 0.7 (SEBVET01_5_172625, VALBOT01_77_172205, both
+    # human-rated CALM). This does NOT mean fatigue detection works;
+    # it means we haven't seen it fail again yet. Needs real fatigued
+    # clips before this can be trusted. Bias toward precision, not
+    # recall -- see charter risk register.
+    FATIGUE_THRESHOLD = float(os.environ.get("FATIGUE_THRESHOLD", "1.1"))
 
     # Recording_Quality / Background_Noise scores below this suppress
     # confidence rather than the label itself -- a noisy clip doesn't

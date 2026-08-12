@@ -63,10 +63,28 @@ def score_waveform(waveform: np.ndarray) -> dict[str, float]:
     return {dim: float(scores[dim]) for dim in TONE_DIMS}
 
 
+def _confidence_from_margin(value: float, threshold: float, scale: float = 1.0) -> float:
+    """How far past `threshold` `value` is, as a smooth 0-1 score.
+
+    Replaces a hard `1.0 - arousal` / raw-value-as-score approach that
+    silently degenerated to exactly 0.0 or 1.0 on every real clip once
+    Day-1 data showed raw Arousal routinely exceeds 1.0 even for CALM
+    clips (see VALIDATION_GATES.md gate 4) -- `1.0 - 1.9` clamped to 0
+    every time, so the field carried no real gradation at all. A
+    logistic margin gives a genuine gradient with no hard edge: 0.5 at
+    the threshold, approaching 1/0 as `value` moves further past it.
+    """
+    import math
+
+    return 1.0 / (1.0 + math.exp(-(value - threshold) / scale))
+
+
 def map_to_label(scores: dict[str, float]) -> tuple[str, float, float]:
     """Raw VoiceCLAP scores -> (tone_label, tone_score, tone_confidence).
 
-    Thresholds are NEEDS_CALIBRATION placeholders (see ToneThresholds).
+    Thresholds are calibrated from the Day-1 human-labeled sample (see
+    ToneThresholds, VALIDATION_GATES.md gate 2/3) -- still n=20, revisit
+    as more labeled clips accumulate.
     Fatigue is checked first and biased toward precision per the
     charter's risk register: a false "fatigued" is worse than a missed
     one in front of judges.
@@ -78,13 +96,13 @@ def map_to_label(scores: dict[str, float]) -> tuple[str, float, float]:
 
     if fatigue >= ToneThresholds.FATIGUE_THRESHOLD:
         label = "FATIGUED"
-        tone_score = fatigue
+        tone_score = _confidence_from_margin(fatigue, ToneThresholds.FATIGUE_THRESHOLD)
     elif arousal >= ToneThresholds.AROUSAL_ELEVATED_THRESHOLD:
         label = "ELEVATED_AROUSAL"
-        tone_score = arousal
+        tone_score = _confidence_from_margin(arousal, ToneThresholds.AROUSAL_ELEVATED_THRESHOLD)
     else:
         label = "CALM"
-        tone_score = 1.0 - arousal
+        tone_score = _confidence_from_margin(ToneThresholds.AROUSAL_ELEVATED_THRESHOLD, arousal)
 
     # Poor recording quality / high background noise doesn't change the
     # label, it lowers how much we trust it -- never silently hide that
@@ -92,4 +110,4 @@ def map_to_label(scores: dict[str, float]) -> tuple[str, float, float]:
     noise_penalty = 1.0 - max(0.0, ToneThresholds.LOW_QUALITY_NOISE_FLOOR - quality)
     confidence = max(0.0, min(1.0, tone_score * noise_penalty))
 
-    return label, float(max(0.0, min(1.0, tone_score))), float(confidence)
+    return label, float(tone_score), float(confidence)

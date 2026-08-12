@@ -61,8 +61,13 @@ def trim_silence(waveform: np.ndarray, sample_rate: int = TARGET_SAMPLE_RATE) ->
     timestamps = get_speech_timestamps(tensor, model, sampling_rate=sample_rate)
     if not timestamps:
         return waveform
-    start = timestamps[0]["start"]
-    end = timestamps[-1]["end"]
+    # Cutting exactly at the VAD boundary changes how Whisper decodes the
+    # onset word (verified on a real clip: trimming to the exact boundary
+    # silently dropped the first utterance entirely, even though it was
+    # inside the detected speech window -- padding by ~0.2s recovered it).
+    pad = int(0.2 * sample_rate)
+    start = max(0, timestamps[0]["start"] - pad)
+    end = min(len(waveform), timestamps[-1]["end"] + pad)
     return waveform[start:end]
 
 

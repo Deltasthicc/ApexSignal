@@ -38,9 +38,30 @@ def warm_up() -> None:
     _load_model()
 
 
+# Distil-whisper defaults to American spelling and has no F1-specific
+# vocabulary, which measurably hurt Day-1 WER: "tyre/tyres" consistently
+# came out "tire/tires", and driver surnames + jargon got mangled or
+# hallucinated (Verstappen -> "the Stappan", damage -> "for Davids").
+# initial_prompt biases decoding toward this vocabulary without
+# retraining anything -- see VALIDATION_GATES.md gate 1 for before/after.
+_F1_INITIAL_PROMPT = (
+    "Formula 1 team radio transcript, British spelling: tyre, tyres, kerb, "
+    "colour. Drivers: Verstappen, Ricciardo, Hamilton, Vettel, Raikkonen, "
+    "Alonso, Perez, Bottas, Stroll, Ocon, Hartley, Leclerc, Hulkenberg. "
+    "Terms: DRS, PU, quali, torque, undercut, box box box, pit board, gap, "
+    "delta, puncture, oversteer, understeer, brake, braking, brake balance."
+)
+
+
 def transcribe(waveform: np.ndarray) -> tuple[str, str]:
     """16 kHz mono float32 array -> (transcript, model_id_used)."""
     model = _load_model()
-    segments, _info = model.transcribe(waveform, language="en", vad_filter=False)
+    segments, _info = model.transcribe(
+        waveform,
+        language="en",
+        vad_filter=False,
+        beam_size=8,
+        initial_prompt=_F1_INITIAL_PROMPT,
+    )
     transcript = " ".join(segment.text.strip() for segment in segments).strip()
     return transcript, _active_model_id
