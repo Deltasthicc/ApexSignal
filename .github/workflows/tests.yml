@@ -7,6 +7,18 @@ on:
     branches: [integration/main]
 
 jobs:
+  data_pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # Deliberately not requirements.txt: the window tests run on synthetic
+      # frames, so CI never installs FastF1 or downloads a session.
+      - run: pip install -r data_pipeline/requirements-test.txt
+      - run: pytest data_pipeline/tests
+
   radio_ai:
     runs-on: ubuntu-latest
     steps:
