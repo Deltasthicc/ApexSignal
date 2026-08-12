@@ -24,6 +24,12 @@ data/audio/*
 !data/audio/.gitkeep
 data/telemetry/*
 !data/telemetry/.gitkeep
+# radio_ai live-pipeline output -- placeholder-incident-id runs before
+# Jagrav's incident_manifest.json exists shouldn't get committed by
+# accident. One dated snapshot with an explanatory README was committed
+# deliberately on 2026-08-12; this rule only affects new/future files.
+data/radio_analysis/*
+!data/radio_analysis/README.md
 *.parquet
 *.wav
 *.mp3
