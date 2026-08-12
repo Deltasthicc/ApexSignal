@@ -1,13 +1,23 @@
 """Gate 6: benchmark the complaint classifier against a human-labeled
 worksheet (see build_classifier_worksheet.py). Computes macro-F1 and
-NO_COMPLAINT F1 for both deberta-v3-base and deberta-v3-xsmall, prints
-a summary ready to paste into VALIDATION_GATES.md.
+NO_COMPLAINT F1 for both deberta-v3-base and deberta-v3-xsmall, AND
+sweeps NULL_THRESHOLD to find the value that actually discriminates on
+this domain -- the frozen 0.5 default was always a NEEDS_CALIBRATION
+placeholder (see app/config.py), never validated, and the live
+pipeline returning complaint_category=None on 40/40 real clips so far
+is exactly the failure mode this sweep exists to catch: multi_label=True
+scores each label's entailment independently (not a softmax that sums
+to 1), so it is entirely plausible for every label, including
+NO_COMPLAINT, to sit under 0.5 on short idiomatic radio phrasing. This
+mirrors how AROUSAL_ELEVATED_THRESHOLD was calibrated in gate 2 -- grid
+search against real human labels, not a guess.
 
 Reimplements the same decision logic as app/complaint_classifier.py
-(same ClassifierConfig constants: taxonomy wording, precedence order,
-null threshold) rather than calling it directly, so two different
-model_ids can be benchmarked in one process without fighting that
-module's single cached pipeline.
+(same ClassifierConfig constants: taxonomy wording, precedence order)
+rather than calling it directly, so two different model_ids can be
+benchmarked in one process without fighting that module's single
+cached pipeline, and so the threshold can vary per sweep step without
+touching global config state.
 
 Usage:
     python scripts/benchmark_classifier.py --worksheet classifier_worksheet.csv
@@ -26,13 +36,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.config import ClassifierConfig, ModelConfig  # noqa: E402
 
 LABELS = list(ClassifierConfig.TAXONOMY.keys())  # includes NO_COMPLAINT
+THRESHOLD_SWEEP = [round(0.05 * i, 2) for i in range(1, 13)]  # 0.05 .. 0.60
 
 
-def classify_with(pipeline_obj, transcript: str) -> str:
-    """Same decision rule as app/complaint_classifier.py::classify,
-    but returns a label from LABELS directly (never None) since the
-    worksheet always has a human_label to compare against, including
-    NO_COMPLAINT explicitly -- no null/None special-casing needed here.
+def score_transcript(pipeline_obj, transcript: str) -> dict[str, float]:
+    """One model call -> raw per-label scores. Cache this; it's the
+    expensive part. Everything threshold-dependent happens on the
+    cached result, not here.
     """
     result = pipeline_obj(
         transcript,
@@ -40,15 +50,22 @@ def classify_with(pipeline_obj, transcript: str) -> str:
         hypothesis_template=ClassifierConfig.HYPOTHESIS_TEMPLATE,
         multi_label=True,
     )
-    scored = dict(zip(result["labels"], result["scores"]))
+    return dict(zip(result["labels"], result["scores"]))
 
-    if scored.get("NO_COMPLAINT", 0.0) >= ClassifierConfig.NULL_THRESHOLD:
+
+def decide(scored: dict[str, float], null_threshold: float) -> str:
+    """Same decision rule as app/complaint_classifier.py::classify, but
+    parameterized by threshold and always returning a label from LABELS
+    (never None) -- the worksheet always has a human_label to compare
+    against, including NO_COMPLAINT explicitly.
+    """
+    if scored.get("NO_COMPLAINT", 0.0) >= null_threshold:
         top_non_null = max((l for l in scored if l != "NO_COMPLAINT"), key=lambda l: scored[l])
         if scored["NO_COMPLAINT"] >= scored[top_non_null]:
             return "NO_COMPLAINT"
 
     for label in ClassifierConfig.PRECEDENCE_ORDER:
-        if scored.get(label, 0.0) >= ClassifierConfig.NULL_THRESHOLD:
+        if scored.get(label, 0.0) >= null_threshold:
             return label
 
     return "NO_COMPLAINT"
@@ -77,35 +94,54 @@ def compute_f1(rows: list[tuple[str, str]]) -> tuple[dict[str, float], float]:
     return per_class_f1, macro_f1
 
 
-def run_model(model_id: str, revision: str, examples: list[tuple[str, str]]) -> None:
+def run_model(model_id: str, revision: str, examples: list[tuple[str, str]]) -> float:
     from transformers import pipeline
 
     print(f"\nLoading {model_id} ({revision[:8]})...")
     classifier = pipeline("zero-shot-classification", model=model_id, revision=revision)
 
-    predictions = []
-    for transcript, true_label in examples:
-        pred = classify_with(classifier, transcript)
-        predictions.append((true_label, pred))
+    print(f"Scoring {len(examples)} examples (one model call each, cached for the sweep)...")
+    cached_scores = [
+        (true_label, score_transcript(classifier, transcript))
+        for transcript, true_label in examples
+    ]
 
-    per_class_f1, macro_f1 = compute_f1(predictions)
+    print(f"\n=== {model_id}: threshold sweep ===")
+    print(f"{'threshold':<10} {'macro-F1':<10} {'NO_COMPLAINT F1':<16} {'accuracy':<10}")
+    best_threshold, best_macro_f1, best_per_class = None, -1.0, None
+    for threshold in THRESHOLD_SWEEP:
+        predictions = [(true, decide(scored, threshold)) for true, scored in cached_scores]
+        per_class_f1, macro_f1 = compute_f1(predictions)
+        n_correct = sum(1 for true, pred in predictions if true == pred)
+        accuracy = n_correct / len(predictions)
+        marker = ""
+        if macro_f1 > best_macro_f1:
+            best_macro_f1, best_threshold, best_per_class = macro_f1, threshold, per_class_f1
+            marker = "  <- best so far"
+        print(f"{threshold:<10} {macro_f1:<10.3f} {per_class_f1['NO_COMPLAINT']:<16.3f} {accuracy:<10.1%}{marker}")
 
-    print(f"\n=== {model_id} ===")
+    print(f"\nBest threshold for {model_id}: {best_threshold} (macro-F1={best_macro_f1:.3f})")
+    print("Per-class F1 at that threshold:")
     for label in LABELS:
-        print(f"  {label:<28s} F1={per_class_f1[label]:.3f}")
-    print(f"  {'MACRO-F1':<28s} {macro_f1:.3f}")
-    print(f"  {'NO_COMPLAINT F1':<28s} {per_class_f1['NO_COMPLAINT']:.3f}")
+        print(f"  {label:<28s} F1={best_per_class[label]:.3f}")
 
-    n_correct = sum(1 for true, pred in predictions if true == pred)
-    print(f"  accuracy: {n_correct}/{len(predictions)} ({n_correct / len(predictions):.1%})")
-
-    mistakes = [(t, tr, p) for (tr, t), (_, p) in zip(examples, predictions) if t != p]
+    best_predictions = [(true, decide(scored, best_threshold)) for true, scored in cached_scores]
+    mistakes = [
+        (t, tr, p) for (tr, t), (_, p) in zip(examples, best_predictions) if t != p
+    ]
     if mistakes:
-        print(f"  mistakes ({len(mistakes)}):")
+        print(f"Mistakes at best threshold ({len(mistakes)}):")
         for true, transcript, pred in mistakes[:15]:
             print(f"    [{true} -> {pred}] {transcript[:80]!r}")
 
-    return macro_f1
+    print(
+        f"\nCurrent config default (NULL_THRESHOLD={ClassifierConfig.NULL_THRESHOLD}) "
+        f"is {'the same as' if ClassifierConfig.NULL_THRESHOLD == best_threshold else 'DIFFERENT from'} "
+        f"the best threshold found. If different, update NULL_THRESHOLD in "
+        f".env / app/config.py to {best_threshold} before trusting live output."
+    )
+
+    return best_macro_f1
 
 
 def main(worksheet_path: str) -> None:
@@ -144,7 +180,10 @@ def main(worksheet_path: str) -> None:
 
     print("\n=== Gate 6c decision ===")
     diff_pp = (base_f1 - xsmall_f1) * 100
-    print(f"base macro-F1={base_f1:.3f}, xsmall macro-F1={xsmall_f1:.3f}, diff={diff_pp:.1f}pp")
+    print(
+        f"base best macro-F1={base_f1:.3f}, xsmall best macro-F1={xsmall_f1:.3f}, "
+        f"diff={diff_pp:.1f}pp (each at its own best threshold from the sweep above)"
+    )
     if diff_pp <= 3.0:
         print(
             "xsmall is within 3pp of base. Per VALIDATION_GATES.md gate 6c: "

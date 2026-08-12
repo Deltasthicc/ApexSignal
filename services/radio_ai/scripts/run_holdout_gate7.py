@@ -36,6 +36,25 @@ from extract_audio_clips import main as extract_clips  # noqa: E402
 
 ALREADY_USED_LABELS_CSV = Path(__file__).resolve().parents[1] / "human_labels.csv"
 
+# Real F1 radio occasionally carries a genuine driver health/distress
+# moment (e.g. a driver reporting they feel unwell and discussing
+# retiring). That is not a mechanical complaint, and the charter is
+# explicit that this project never diagnoses or exploits anything
+# resembling a psychological/medical state. Keyword-flag these rows so
+# they can't be mistaken for an ordinary candidate while scanning the
+# table -- narrow and high-precision on purpose, not a general safety
+# filter, so it doesn't need reviewing for false positives every run.
+SENSITIVE_CONTENT_KEYWORDS = [
+    "don't feel well", "not feeling well", "feel unwell", "feeling unwell",
+    "retire", "retiring", "medical", "chest pain", "can't breathe",
+    "dizzy", "hospital",
+]
+
+
+def flag_sensitive(transcript: str) -> bool:
+    text = transcript.lower()
+    return any(kw in text for kw in SENSITIVE_CONTENT_KEYWORDS)
+
 
 def already_used_ids() -> set[str]:
     if not ALREADY_USED_LABELS_CSV.exists():
@@ -86,6 +105,10 @@ def main(count: int, out_dir: Path, report_path: Path, seed: int) -> None:
         result = run_live_pipeline(waveform, incident_id)
         results.append((clip_path, result))
 
+    flagged_ids = [
+        result.incident_id for _, result in results if flag_sensitive(result.transcript)
+    ]
+
     lines = [
         "# Gate 7 holdout report",
         "",
@@ -97,6 +120,22 @@ def main(count: int, out_dir: Path, report_path: Path, seed: int) -> None:
         "Before using any of these as an actual demo clip, listen to it and "
         "correct the transcript by hand -- that step is not done here.",
         "",
+    ]
+    if flagged_ids:
+        lines += [
+            "## ⚠️ Flagged: do not use for the demo",
+            "",
+            "The following clip(s) contain language matching a genuine driver "
+            "health/distress moment, not a mechanical complaint. The project's "
+            "own charter is explicit that this system never diagnoses or "
+            "exploits anything resembling a psychological or medical state -- "
+            "these are excluded from demo consideration, full stop, regardless "
+            "of how interesting the tone/complaint output looks:",
+            "",
+        ]
+        lines += [f"- `{incident_id}`" for incident_id in flagged_ids]
+        lines.append("")
+    lines += [
         "## Provenance (applies to every row below)",
         "",
         f"- ASR: `{ModelConfig.ASR_MODEL_ID}` @ `{ModelConfig.ASR_MODEL_REVISION}`",
@@ -114,9 +153,17 @@ def main(count: int, out_dir: Path, report_path: Path, seed: int) -> None:
     ]
     for clip_path, result in results:
         transcript_escaped = result.transcript.replace("|", "\\|")
+        id_cell = (
+            f"⚠️ `{result.incident_id}`"
+            if result.incident_id in flagged_ids
+            else f"`{result.incident_id}`"
+        )
+        category_cell = (
+            result.complaint_category.value if result.complaint_category else "None"
+        )
         lines.append(
-            f"| `{result.incident_id}` | {transcript_escaped} | {result.tone_label} | "
-            f"{result.tone_score:.3f} | {result.complaint_category} |"
+            f"| {id_cell} | {transcript_escaped} | {result.tone_label.value} | "
+            f"{result.tone_score:.3f} | {category_cell} |"
         )
 
     report_path.write_text("\n".join(lines), encoding="utf-8")
