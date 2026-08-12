@@ -29,6 +29,7 @@ function pointAt(circuit: CircuitShape, fraction: number, width: number, height:
 }
 
 const BACKDROP_LAP_DURATION_MS = 16000;
+const LAST_BACKDROP_CIRCUIT_KEY = "apexsignal.last-background-circuit";
 
 function randomIndex(length: number) {
   if (length <= 1) return 0;
@@ -43,6 +44,14 @@ function nextCircuitIndex(currentIndex: number | null) {
 
   const candidate = randomIndex(CIRCUITS.length - 1);
   return candidate >= currentIndex ? candidate + 1 : candidate;
+}
+
+function rememberCircuit(index: number) {
+  try {
+    window.sessionStorage.setItem(LAST_BACKDROP_CIRCUIT_KEY, CIRCUITS[index].key);
+  } catch {
+    // The animation still works when browser storage is unavailable.
+  }
 }
 
 function DriverMarker({
@@ -83,7 +92,18 @@ export function AnimatedCircuitBackground() {
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    setCircuitIndex(nextCircuitIndex(null));
+    let previousIndex: number | null = null;
+    try {
+      const previousKey = window.sessionStorage.getItem(LAST_BACKDROP_CIRCUIT_KEY);
+      const storedIndex = CIRCUITS.findIndex((circuit) => circuit.key === previousKey);
+      previousIndex = storedIndex >= 0 ? storedIndex : null;
+    } catch {
+      // Fall back to an unconstrained first pick when storage is unavailable.
+    }
+
+    const nextIndex = nextCircuitIndex(previousIndex);
+    rememberCircuit(nextIndex);
+    setCircuitIndex(nextIndex);
   }, []);
 
   useEffect(() => {
@@ -97,7 +117,11 @@ export function AnimatedCircuitBackground() {
   useEffect(() => {
     if (reducedMotion) return;
     const interval = window.setInterval(() => {
-      setCircuitIndex((current) => nextCircuitIndex(current));
+      setCircuitIndex((current) => {
+        const nextIndex = nextCircuitIndex(current);
+        rememberCircuit(nextIndex);
+        return nextIndex;
+      });
     }, BACKDROP_LAP_DURATION_MS);
     return () => window.clearInterval(interval);
   }, [reducedMotion]);
