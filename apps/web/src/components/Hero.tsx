@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Reveal } from "@/components/Reveal";
-import { CircuitBackdrop, CircuitSignalGraphic } from "@/components/CircuitAtlas";
+import { CircuitSignalGraphic } from "@/components/CircuitAtlas";
 
 export function Hero({
   sessionId,
@@ -38,7 +38,6 @@ export function Hero({
         backgroundSize: "34px 34px",
       }}
     >
-      <CircuitBackdrop />
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
         <div>
           <p className="label-red mb-4">

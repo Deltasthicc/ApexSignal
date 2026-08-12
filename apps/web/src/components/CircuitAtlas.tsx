@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CIRCUITS, type CircuitShape } from "@/data/circuits";
 import { Reveal } from "@/components/Reveal";
 
@@ -28,25 +28,138 @@ function pointAt(circuit: CircuitShape, fraction: number, width: number, height:
   };
 }
 
-export function CircuitBackdrop() {
+const BACKDROP_LAP_DURATION_MS = 16000;
+
+function randomIndex(length: number) {
+  if (length <= 1) return 0;
+  const values = new Uint32Array(1);
+  window.crypto.getRandomValues(values);
+  return values[0] % length;
+}
+
+function nextCircuitIndex(currentIndex: number | null) {
+  if (currentIndex === null) return randomIndex(CIRCUITS.length);
+  if (CIRCUITS.length <= 1) return 0;
+
+  const candidate = randomIndex(CIRCUITS.length - 1);
+  return candidate >= currentIndex ? candidate + 1 : candidate;
+}
+
+function DriverMarker({
+  path,
+  start,
+  reducedMotion,
+}: {
+  path: string;
+  start: { x: number; y: number };
+  reducedMotion: boolean;
+}) {
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.055]">
-      <div className="grid h-full grid-cols-3 gap-12 p-8 md:grid-cols-5">
-        {CIRCUITS.slice(0, 15).map((circuit, index) => (
-          <svg
-            key={circuit.key}
-            viewBox="0 0 160 100"
-            className={`h-full min-h-20 w-full ${index % 2 ? "translate-y-8" : "-translate-y-2"}`}
-          >
-            <path
-              d={circuitPath(circuit, 160, 100, 8)}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-        ))}
+    <g transform={reducedMotion ? `translate(${start.x} ${start.y})` : undefined}>
+      {reducedMotion ? null : (
+        <animateMotion
+          dur={`${BACKDROP_LAP_DURATION_MS / 1000}s`}
+          path={path}
+          repeatCount="1"
+          rotate="auto"
+        />
+      )}
+      <circle r="26" fill="#e10600" fillOpacity="0.13" className="site-driver-halo" />
+      <path
+        d="M -13 -7 L 5 -7 L 15 -3.5 L 15 3.5 L 5 7 L -13 7 L -17 3 L -17 -3 Z"
+        fill="#e10600"
+        stroke="#f0f0f0"
+        strokeWidth="1.5"
+      />
+      <rect x="-11" y="-10" width="4" height="20" rx="1" fill="#e10600" />
+      <circle cx="3" cy="0" r="2.4" fill="#ffd60a" />
+      <path d="M 8 -5 L 14 0 L 8 5" fill="none" stroke="#f0f0f0" strokeWidth="1.3" />
+    </g>
+  );
+}
+
+export function AnimatedCircuitBackground() {
+  const [circuitIndex, setCircuitIndex] = useState<number | null>(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    setCircuitIndex(nextCircuitIndex(null));
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setReducedMotion(media.matches);
+    updatePreference();
+    media.addEventListener("change", updatePreference);
+    return () => media.removeEventListener("change", updatePreference);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const interval = window.setInterval(() => {
+      setCircuitIndex((current) => nextCircuitIndex(current));
+    }, BACKDROP_LAP_DURATION_MS);
+    return () => window.clearInterval(interval);
+  }, [reducedMotion]);
+
+  const circuit = circuitIndex === null ? null : CIRCUITS[circuitIndex];
+  const path = useMemo(
+    () => (circuit ? circuitPath(circuit, 1000, 700, 70) : ""),
+    [circuit]
+  );
+  const start = useMemo(
+    () => (circuit ? pointAt(circuit, 0, 1000, 700, 70) : { x: 0, y: 0 }),
+    [circuit]
+  );
+
+  if (!circuit) return null;
+
+  return (
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-40 overflow-hidden mix-blend-screen">
+      <div key={circuit.key} className="site-circuit-scene relative h-full w-full">
+        <svg
+          viewBox="0 0 1000 700"
+          preserveAspectRatio="xMidYMid slice"
+          className="h-full w-full"
+        >
+          <defs>
+            <filter id="site-driver-glow" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur stdDeviation="8" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <path
+            d={path}
+            fill="none"
+            stroke="#f0f0f0"
+            strokeOpacity="0.72"
+            strokeWidth="10"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d={path}
+            fill="none"
+            stroke="#e10600"
+            strokeOpacity="0.9"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            pathLength="1000"
+            className="site-circuit-trace"
+          />
+          <g filter="url(#site-driver-glow)">
+            <DriverMarker path={path} start={start} reducedMotion={reducedMotion} />
+          </g>
+        </svg>
+        <div className="absolute bottom-7 right-7 border-r border-red pr-3 text-right uppercase tracking-[0.18em] text-ink">
+          <p className="text-[8px] text-red">background lap · {circuit.code}</p>
+          <p className="mt-1 text-[10px]">{circuit.name}</p>
+          <p className="mt-1 text-[7px] text-dim">{circuit.location}</p>
+        </div>
       </div>
     </div>
   );

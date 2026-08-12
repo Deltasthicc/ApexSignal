@@ -92,6 +92,56 @@ body {
   transition: stroke 180ms ease, filter 180ms ease;
 }
 
+@keyframes site-circuit-scene {
+  0% {
+    opacity: 0;
+    transform: scale(1.025);
+  }
+  9% {
+    opacity: 0.18;
+  }
+  86% {
+    opacity: 0.18;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.site-circuit-scene {
+  opacity: 0;
+  animation: site-circuit-scene 16s ease-in-out forwards;
+  will-change: opacity, transform;
+}
+
+.site-circuit-trace {
+  stroke-dasharray: 7 11;
+  animation: site-circuit-flow 2.8s linear infinite;
+}
+
+@keyframes site-circuit-flow {
+  to {
+    stroke-dashoffset: -36;
+  }
+}
+
+.site-driver-halo {
+  animation: site-driver-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes site-driver-pulse {
+  0%,
+  100% {
+    transform: scale(0.75);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
 button:hover .circuit-card-line,
 button[aria-pressed="true"] .circuit-card-line {
   stroke: #e10600;
@@ -165,7 +215,18 @@ button[aria-pressed="true"] .circuit-card-line {
 
   .circuit-draw,
   .circuit-card-line,
-  .hero-line {
+  .hero-line,
+  .site-circuit-trace {
     stroke-dashoffset: 0;
+  }
+
+  .site-circuit-scene {
+    animation: none !important;
+    opacity: 0.18;
+    transform: none;
+  }
+
+  .site-driver-halo {
+    animation: none !important;
   }
 }

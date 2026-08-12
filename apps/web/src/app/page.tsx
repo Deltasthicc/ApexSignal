@@ -20,7 +20,10 @@ import { LiveInspector } from "@/components/LiveInspector";
 import { EvidenceStory } from "@/components/EvidenceStory";
 import { ScopeSection } from "@/components/ScopeSection";
 import { MaterialsSection, TeamSection } from "@/components/MaterialsTeam";
-import { CircuitAtlasSection } from "@/components/CircuitAtlas";
+import {
+  AnimatedCircuitBackground,
+  CircuitAtlasSection,
+} from "@/components/CircuitAtlas";
 
 type Loadable<T> = T | "loading" | "error";
 
@@ -95,6 +98,7 @@ export default function PitWallPage() {
   return (
     <main className="bg-bg">
       <TopBar />
+      <AnimatedCircuitBackground />
 
       <Hero
         sessionId={Array.isArray(entries) && entries[0] ? entries[0].session_id : "—"}
