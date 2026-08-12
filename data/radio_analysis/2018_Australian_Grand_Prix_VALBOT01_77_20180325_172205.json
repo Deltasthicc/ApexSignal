@@ -1,0 +1,10 @@
+{
+  "incident_id": "2018_Australian_Grand_Prix_VALBOT01_77_20180325_172205",
+  "transcript": "We think the Stappen has some damage.",
+  "tone_label": "CALM",
+  "tone_score": 0.7912881880011816,
+  "tone_confidence": 0.7912881880011816,
+  "complaint_category": null,
+  "category_confidence": null,
+  "text_tone_disagreement": null
+}

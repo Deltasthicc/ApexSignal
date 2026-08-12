@@ -1,0 +1,10 @@
+{
+  "incident_id": "2018_Australian_Grand_Prix_DANRIC01_3_20180325_170323",
+  "transcript": "Two cars ahead. Older tires. Safety car is entering the pit lane. Now, safety car is in this lap.",
+  "tone_label": "CALM",
+  "tone_score": 0.6636077574640289,
+  "tone_confidence": 0.6636077574640289,
+  "complaint_category": null,
+  "category_confidence": null,
+  "text_tone_disagreement": null
+}

@@ -1,0 +1,10 @@
+{
+  "incident_id": "2018_Australian_Grand_Prix_DANRIC01_3_20180325_170519",
+  "transcript": "Okay, so these tires are going to be fine to the end. You did 26 laps on the first stint. Where was good. These tires will be good.",
+  "tone_label": "CALM",
+  "tone_score": 0.6825191692936952,
+  "tone_confidence": 0.6825191692936952,
+  "complaint_category": null,
+  "category_confidence": null,
+  "text_tone_disagreement": null
+}

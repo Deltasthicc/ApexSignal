@@ -1,0 +1,10 @@
+{
+  "incident_id": "2018_Australian_Grand_Prix_MAXVER01_33_20180325_163337",
+  "transcript": "Okay, Max, can we have a status update, please? Yeah, the rear tyres are getting really hot, but that's a bit my problem. I have to close all the tools. And can I have a front-wing update when you can. Yeah, a little bit less. Half a degree or something. Understood.",
+  "tone_label": "ELEVATED_AROUSAL",
+  "tone_score": 0.5911192504526585,
+  "tone_confidence": 0.5911192504526585,
+  "complaint_category": null,
+  "category_confidence": null,
+  "text_tone_disagreement": null
+}

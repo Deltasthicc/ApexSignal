@@ -1,0 +1,10 @@
+{
+  "incident_id": "2018_Australian_Grand_Prix_SEBVET01_5_20180325_172625",
+  "transcript": "He locked the front and we went out behind you. A brake, engine 7 available. It's still two seconds behind you.",
+  "tone_label": "FATIGUED",
+  "tone_score": 0.5077340751803927,
+  "tone_confidence": 0.5077340751803927,
+  "complaint_category": null,
+  "category_confidence": null,
+  "text_tone_disagreement": null
+}
