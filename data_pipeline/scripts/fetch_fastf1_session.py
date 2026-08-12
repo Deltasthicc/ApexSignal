@@ -62,6 +62,8 @@ def fetch_session(year: int, grand_prix: str, session: str, driver: str) -> Path
     fastf1.Cache.enable_cache(str(CACHE_DIR))
 
     race = fastf1.get_session(year, grand_prix, session)
+    # telemetry=True is not optional: t0_date -- the clock origin this whole
+    # project hangs on -- is only populated by the telemetry load.
     race.load(laps=True, telemetry=True, weather=False, messages=False)
 
     event_name = str(race.event["EventName"])
@@ -114,6 +116,9 @@ def fetch_session(year: int, grand_prix: str, session: str, driver: str) -> Path
         "first_lap": int(index["lap"].min()),
         "last_lap": int(index["lap"].max()),
         "lap_index_file": index_path.name,
+        # Needed by fetch_team_radio.py to locate TeamRadio.json for this
+        # session in the livetiming archive.
+        "api_path": race.api_path,
         "fastf1_version": getattr(fastf1, "__version__", "unknown"),
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
     }

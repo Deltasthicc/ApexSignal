@@ -19,16 +19,41 @@ python data_pipeline/scripts/fetch_fastf1_session.py \
 # 2. Verify lap boundaries by hand against timing data.
 #    data/telemetry/<session_id>/laps_VER.csv
 
-# 3. Curate incidents (event_time_ms on the session clock -- see below).
+# 3. Pull the driver's team radio onto the session clock. Needs network.
+#    Produces radio_candidates_<DRV>.csv: every capture with a real
+#    event_time_ms, its lap, and whether that lap can support a baseline.
+python data_pipeline/scripts/fetch_team_radio.py \
+    --session-id 2023_ITALIAN_GRAND_PRIX_R --driver SAI [--download]
+
+# 4. Listen to the candidates, pick the complaints, curate them.
 python data_pipeline/scripts/build_incident_manifest.py
 
-# 4. Build one multi-lap telemetry window per incident. Offline.
+# 5. Build one multi-lap telemetry window per incident. Offline.
 python data_pipeline/scripts/build_telemetry_windows.py \
-    --session-id 2023_ITALIAN_GRAND_PRIX_R --driver VER
+    --session-id 2023_ITALIAN_GRAND_PRIX_R --driver SAI
 
-# 5. Gate. Run before every demo. Offline.
+# 6. Gate. Run before every demo. Offline.
 python data_pipeline/scripts/validate_telemetry_windows.py
 ```
+
+## Where event_time_ms comes from
+
+Not from a stopwatch against broadcast footage. The F1 livetiming archive
+publishes `TeamRadio.json` per session — one entry per capture with an
+absolute UTC instant, the driver's racing number, and an mp3 path. So:
+
+```
+session_time_s = (capture Utc - t0_date).total_seconds()
+event_time_ms  = session_time_s * 1000
+```
+
+`t0_date` is verified to be the true anchor: across every telemetry sample,
+`Date - SessionTime` is a single constant equal to it. Radio and telemetry
+are therefore on the same clock by construction, not by careful manual work
+that has to be repeated correctly for every incident.
+
+FastF1 itself has no team radio API — `fetch_team_radio.py` reads the
+livetiming archive directly.
 
 ## The clock rule
 
