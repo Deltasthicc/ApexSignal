@@ -3,17 +3,21 @@ version: "3.9"
 services:
   radio_ai:
     build:
-      context: ../services/radio_ai
+      context: ..
+      dockerfile: services/radio_ai/Dockerfile
     ports:
       - "8002:8002"
     env_file:
       - ../services/radio_ai/.env
     volumes:
-      - ../data:/app/data:ro
+      # writable: radio_ai writes {incident_id}.json here for core_api
+      # to read directly from disk -- see contracts/api_contract.md.
+      - ../data:/srv/data
 
   core_api:
     build:
-      context: ../services/core_api
+      context: ..
+      dockerfile: services/core_api/Dockerfile
     ports:
       - "8001:8001"
     env_file:
@@ -21,15 +25,15 @@ services:
     depends_on:
       - radio_ai
     volumes:
-      - ../data:/app/data:ro
-      - ../storage:/app/storage
+      - ../data:/srv/data:ro
+      - ../storage:/srv/storage
 
   web:
     build:
       context: ../apps/web
+      args:
+        NEXT_PUBLIC_CORE_API_BASE_URL: http://core_api:8001
     ports:
       - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_CORE_API_BASE_URL=http://core_api:8001
     depends_on:
       - core_api

@@ -23,6 +23,29 @@ Produced by `services/radio_ai`, `POST /v1/radio/analyze`. Consumed by
 See `contracts/schemas/radio_analysis_output.schema.json` and
 `contracts/fixtures/radio_analysis_output.sample.json`.
 
+### Output location (settled 2026-08-12)
+
+`POST /v1/radio/analyze` exists, but it is **not** the integration path
+between `radio_ai` and `core_api`. `core_api` reads `RadioAnalysisOutput`
+directly from disk, one file per incident, so its own test suite and
+independent evaluation can run with no other service alive:
+
+```text
+{RADIO_ANALYSIS_OUTPUT_DIR}/{incident_id}.json
+```
+
+Both sides default to the same physical path, `data/radio_analysis/`
+(repo-root-relative), but resolve it via their own env var —
+`RADIO_ANALYSIS_OUTPUT_DIR` on the `radio_ai` side,
+`CORE_API_RADIO_ANALYSIS_DIR` on the `core_api` side. There is no shared
+config file; matching defaults is the agreement. Each file is exactly
+one `RadioAnalysisOutput`, JSON, matching the schema above —
+`core_api` reads it with `RadioAnalysisOutput.model_validate_json()`
+verbatim. `radio_ai` writes this file itself after every live-mode
+`/v1/radio/analyze` call, and `scripts/generate_radio_analysis.py`
+writes it directly from a local clip with no HTTP round-trip at all —
+use that for batch-populating incidents before a demo.
+
 ### Complaint taxonomy (frozen, max 5 categories)
 
 1. `EXIT_TRACTION_REAR` — rear instability / traction complaint on corner exit.
