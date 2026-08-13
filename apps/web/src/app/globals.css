@@ -102,7 +102,7 @@ body {
 }
 
 .race-replay-layer {
-  opacity: 0.82;
+  opacity: 0.3;
 }
 
 button:hover .circuit-card-line,
