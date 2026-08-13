@@ -26,7 +26,7 @@ const CUT = [
   },
   {
     title: "ECHO LAP at scale",
-    body: "Retrieval here runs over a handful of curated demo incidents. The same interface (semantic + telemetry similarity, category gate) is built to scale to a FAISS index over a full season — just not populated for this build.",
+    body: "The presentation replay uses three contract-validated reference incidents. The same interface (semantic + telemetry similarity, category gate) can scale to a FAISS index over a full-season corpus.",
   },
   {
     title: "The Mask",

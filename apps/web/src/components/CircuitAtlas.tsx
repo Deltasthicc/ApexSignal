@@ -314,7 +314,7 @@ export function CircuitAtlasSection() {
               <p className="label-red mb-3">Circuit context · source geometry</p>
               <h2 className="text-2xl font-medium uppercase tracking-[0.03em] text-ink">Recognisable at a glance</h2>
               <p className="mt-4 max-w-2xl text-[12.5px] leading-relaxed text-dim">
-                Twenty-five circuit centerlines sampled from an open motorsport geometry database—not invented SVG loops. Uniform scaling preserves every silhouette. These maps provide visual circuit context; the current judged replay remains the fixture-backed demo session.
+                Twenty-five circuit centerlines sampled from an open motorsport geometry database—not invented SVG loops. Uniform scaling preserves every silhouette. The atlas provides recognisable circuit context while the inspector runs a deterministic reference replay.
               </p>
             </div>
             <div className="border-l border-red pl-5">

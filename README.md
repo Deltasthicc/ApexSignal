@@ -17,6 +17,18 @@ license: mit
 
 Built for **AI Race Month — GrandPrix Hackathon @ Paytm**, anchored on **Problem Statement 1: The Silent Co-Driver**. Theme: Artificial Intelligence in Racing Strategy & Decision-Making, powered by Hugging Face.
 
+## Public build
+
+- **Presentation site:** https://apex-signal-sigma.vercel.app
+- **Replay API:** https://apexsignal-mock-server.onrender.com/health
+- **Source:** https://github.com/Deltasthicc/ApexSignal
+
+The public site calls the deployed replay API and automatically falls back to
+the same contract-validated records in the browser if the free Render service
+is waking up. See [`docs/PRESENTATION_RUNBOOK.md`](docs/PRESENTATION_RUNBOOK.md)
+for the 90-second judge flow and [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md)
+for the exact shipped/roadmap boundary.
+
 ## What it does
 
 Formula 1 teams have dense telemetry, but a driver can perceive a change in handling, grip, or braking before it shows up in a lap-time graph. That feedback arrives as short, subjective radio language ("rear's moving," "no front," "same thing again"), while telemetry arrives as numbers. Nobody connects the two.
@@ -99,7 +111,7 @@ Ownership is enforced by folder, not by convention. See [`CONTRIBUTING.md`](CONT
 
 ## Getting started
 
-Each service is independently runnable against fixture data from Day 1. No service should require another service to be running.
+Each service is independently runnable against the deterministic reference replay. No service should require another service to be running.
 
 ### Fastest path — one screen, zero backend setup
 
@@ -112,7 +124,7 @@ cd apps/web && npm install && cp .env.local.example .env.local && npm run dev
 Open `http://localhost:3000`. This runs the full ApexSignal UI — replay
 timeline, radio pins, tone/complaint classification, baseline evidence,
 the gold-incident lead-time card, and the Pit-Wall toggle — against
-`mock_server`'s fixture data (`contracts/fixtures/`). No GPU, no model
+the replay API's contract records (`contracts/fixtures/`). No GPU, no model
 downloads, no other service required.
 
 ### Full stack, real `core_api`
@@ -138,16 +150,27 @@ docker compose -f deployment/docker-compose.yml up --build
 ```
 
 Brings up `mock_server` (8000), `core_api` (8001, fixture mode), and
-`web` (3000) — the same fixture-backed demo, containerized. The real
+`web` (3000) — the same deterministic reference replay, containerized. The real
 `services/radio_ai` pipeline (Whisper + tone + classifier models) is
 opt-in and GPU-oriented; add `--profile live` to also build and start
 it.
 
 Copy `.env.example` to `.env` in each service directory and fill in real values before running against live models. Never commit `.env`.
 
-## Data policy for the demo
+### Verification
 
-The judged path runs entirely from pre-cached local assets: no live FastF1 or network calls during the demo. See [`data_pipeline/README.md`](data_pipeline/README.md) for how the incident corpus is curated and verified.
+```bash
+python scripts/run_test_suites.py
+cd apps/web && npm run build
+```
+
+The Python runner isolates each service's top-level `app` package, avoiding the
+module-name collision caused by collecting every service from the repository
+root.
+
+## Data policy for the presentation replay
+
+The judged path runs from pre-cached, contract-validated records: no live FastF1 call is required during a presentation. See [`data_pipeline/README.md`](data_pipeline/README.md) for how an expanded incident corpus is curated and verified.
 
 ## What ApexSignal does not claim
 
@@ -161,10 +184,10 @@ The judged path runs entirely from pre-cached local assets: no live FastF1 or ne
 
 | Workstream | Focus | Owner |
 |---|---|---|
-| A | Data, telemetry, deterministic replay | TBD |
-| B | Radio & language intelligence (ASR, tone, complaint classification) | TBD |
-| C | Incident memory, evidence engine, core API | TBD |
-| D | Product UI, visualization, deployment | TBD |
+| A | Data, telemetry, deterministic replay | Jagrav |
+| B | Radio & language intelligence (ASR, tone, complaint classification) | Shashwat |
+| C | Incident memory, evidence engine, core API | Tanish |
+| D | Product UI, visualization, deployment | Mohit |
 
 ## License
 

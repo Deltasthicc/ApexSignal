@@ -19,7 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Sequence
 
-from evidence_memory.embeddings import Encoder, cosine_similarity, encode
+from evidence_memory.embeddings import Encoder, cosine_similarity, encode_resilient
 from evidence_memory.telemetry_fingerprint import (
     TelemetryFingerprint,
     compare_fingerprints,
@@ -319,7 +319,7 @@ class IncidentMemory:
             import numpy as np
 
             return np.asarray(self._encoder(texts), dtype=float)
-        return encode(texts)
+        return encode_resilient(texts)
 
 
 def classify_match(

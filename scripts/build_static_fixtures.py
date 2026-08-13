@@ -1,8 +1,8 @@
-"""Compile contract fixtures into a typed browser module for Static Spaces.
+"""Compile contract replay records into a typed browser module.
 
 The Docker/local path still uses HTTP APIs. Hugging Face Static Space builds
 set NEXT_PUBLIC_DATA_MODE=embedded and use this exact contract data so the
-public demo remains interactive without pretending an unavailable backend is
+public replay remains interactive without pretending an unavailable backend is
 online.
 """
 
@@ -35,7 +35,7 @@ def main() -> None:
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(
         "// Generated from contracts/fixtures by scripts/build_static_fixtures.py.\n"
-        "// This is the honest offline/static demo path, not live model output.\n"
+        "// This is the deterministic replay fallback, not live model output.\n"
         f"export const DEMO_FIXTURES = {json.dumps(payload, ensure_ascii=True, separators=(',', ':'))} as const;\n",
         encoding="utf-8",
         newline="\n",

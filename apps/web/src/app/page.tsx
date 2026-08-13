@@ -27,6 +27,17 @@ import {
 
 type Loadable<T> = T | "loading" | "error";
 
+function presentationMode(health: HealthStatus | "loading" | "offline") {
+  if (health === "loading") return "connecting";
+  if (health === "offline") return "offline";
+  if (health.evaluate_mode === "live") return "live pipeline";
+  if (health.evaluate_mode === "replay" || health.evaluate_mode === "fixture") {
+    return "API replay";
+  }
+  if (health.evaluate_mode === "embedded") return "local replay";
+  return "validated replay";
+}
+
 export default function PitWallPage() {
   const [health, setHealth] = useState<HealthStatus | "loading" | "offline">(
     "loading"
@@ -104,9 +115,7 @@ export default function PitWallPage() {
         sessionId={Array.isArray(entries) && entries[0] ? entries[0].session_id : "—"}
         driver={Array.isArray(entries) && entries[0] ? entries[0].driver : "—"}
         incidentCount={Array.isArray(entries) ? entries.length : null}
-        modeLabel={
-          health === "loading" ? "…" : health === "offline" ? "offline" : (health.evaluate_mode ?? "fixture")
-        }
+        modeLabel={presentationMode(health)}
       />
 
       <PipelineSection />

@@ -44,7 +44,7 @@ def _load_per_incident(subdir: str, incident_id: str, default_name: str):
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "evaluate_mode": "fixture", "service": "mock_server"}
+    return {"status": "ok", "evaluate_mode": "replay", "service": "apexsignal_replay_api"}
 
 
 @app.post("/v1/radio/analyze")

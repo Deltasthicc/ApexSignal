@@ -11,7 +11,7 @@ import { Reveal } from "@/components/Reveal";
 import { ReplayTimeline } from "@/components/ReplayTimeline";
 import { IncidentPanel } from "@/components/IncidentPanel";
 import { GoldIncidentCard } from "@/components/GoldIncidentCard";
-import { UploadPanel } from "@/components/UploadPanel";
+import { PresentationPanel } from "@/components/PresentationPanel";
 
 type Loadable<T> = T | "loading" | "error";
 
@@ -43,12 +43,18 @@ export function LiveInspector({
       ? "CONNECTING"
       : health === "offline"
         ? "OFFLINE"
-        : (health.evaluate_mode ?? "fixture").toUpperCase();
+        : health.evaluate_mode === "embedded"
+          ? "LOCAL REPLAY"
+          : health.evaluate_mode === "replay" || health.evaluate_mode === "fixture"
+            ? "API REPLAY"
+            : (health.evaluate_mode ?? "replay").toUpperCase();
   const statusColor =
     health === "loading"
       ? "text-dim border-rule"
       : health === "offline"
         ? "text-red border-red/40 bg-red/5"
+        : health.evaluate_mode === "embedded"
+          ? "text-gold border-gold/40 bg-gold/5"
         : "text-teal border-teal/40 bg-teal/5";
 
   const selectedEntry = Array.isArray(entries)
@@ -56,23 +62,23 @@ export function LiveInspector({
     : null;
   const selectedAssessment = selectedId ? assessmentCache[selectedId] : undefined;
   const selectedRadio = selectedId ? radioCache[selectedId] : undefined;
-  const embeddedDemo = process.env.NEXT_PUBLIC_DATA_MODE !== "remote";
+  const embeddedReplay =
+    typeof health === "object" && health.evaluate_mode === "embedded";
 
   return (
     <section id="live" className="border-t border-rule bg-bg2 px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <Reveal>
-          <p className="label-red mb-3">Try It Live</p>
+          <p className="label-red mb-3">Interactive Replay</p>
           <h2 className="text-2xl font-medium uppercase tracking-[0.03em] text-ink">
             The pit-wall incident inspector
           </h2>
           <p className="mt-3 max-w-2xl text-[12.5px] leading-relaxed text-dim">
-            {embeddedDemo ? (
-              <>Interactive contract fixtures are embedded in this public Hugging Face build</>
+            {embeddedReplay ? (
+              <>The validated replay is running from its resilient browser fallback</>
             ) : (
               <>
-                Real requests against{" "}
-                <code className="text-teal">{process.env.NEXT_PUBLIC_CORE_API_BASE_URL}</code>
+                The validated replay is connected to the public ApexSignal API
               </>
             )}{" "}
             — click a pin, read the evidence, toggle Pit Wall View to see what changes.
@@ -82,7 +88,7 @@ export function LiveInspector({
         <Reveal delayMs={100}>
           <div className="mt-10 border border-rule bg-bg p-6">
             <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-rule pb-4">
-              <p className="label-red">Live Inspector Widget</p>
+              <p className="label-red">Incident Inspector</p>
               <div className="flex items-center gap-3 text-[10px] uppercase tracking-[0.12em]">
                 <span className={`border px-2 py-1 tabular ${statusColor}`}>
                   &#9679; {statusText}
@@ -105,9 +111,8 @@ export function LiveInspector({
             )}
             {entries === "error" && (
               <div className="border border-red/40 bg-red/5 p-6 text-sm text-red">
-                Could not reach the backend at{" "}
-                <code>{process.env.NEXT_PUBLIC_CORE_API_BASE_URL}</code>. Start
-                mock_server (or services/core_api) and reload.
+                The replay could not be loaded. Check the public API connection
+                and reload the page.
               </div>
             )}
 
@@ -164,7 +169,9 @@ export function LiveInspector({
                       </ul>
                     </div>
 
-                    {!pitWallMode && <UploadPanel />}
+                    {!pitWallMode && typeof health === "object" && (
+                      <PresentationPanel health={health} />
+                    )}
                   </div>
                 </div>
               </>

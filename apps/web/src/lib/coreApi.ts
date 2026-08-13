@@ -1,4 +1,4 @@
-// Thin client for services/core_api (or mock_server during early development).
+// Thin client for services/core_api or the public replay API.
 // Response shapes must match contracts/schemas/*.schema.json exactly --
 // nothing here invents a field the backend doesn't send.
 import { DEMO_FIXTURES } from "@/data/demoFixtures";
@@ -66,20 +66,51 @@ export type ManifestEntry = {
 
 export type HealthStatus = {
   status: string;
-  evaluate_mode?: "fixture" | "live";
+  evaluate_mode?: "embedded" | "fixture" | "live" | "replay";
   service?: string;
 };
 
 // services/core_api owns /v1/incidents/* and /v1/replay/*.
-const BASE_URL =
-  process.env.NEXT_PUBLIC_CORE_API_BASE_URL ?? "http://localhost:8000";
+const CONFIGURED_BASE_URL = process.env.NEXT_PUBLIC_CORE_API_BASE_URL;
+const BASE_URL = CONFIGURED_BASE_URL ?? "http://localhost:8000";
 
 // services/radio_ai owns /v1/radio/analyze. In the fast local-dev path
 // (mock_server) one process serves both roles, so this defaults to the
 // same base; docker-compose points it separately when core_api and
 // radio_ai run as distinct containers.
 const RADIO_BASE_URL = process.env.NEXT_PUBLIC_RADIO_AI_BASE_URL ?? BASE_URL;
-const USE_EMBEDDED_FIXTURES = process.env.NEXT_PUBLIC_DATA_MODE !== "remote";
+const DATA_MODE =
+  process.env.NEXT_PUBLIC_DATA_MODE ??
+  (CONFIGURED_BASE_URL ? "remote" : "embedded");
+const USE_REMOTE_API = DATA_MODE === "remote";
+
+function embeddedHealth(): HealthStatus {
+  return {
+    status: "ok",
+    evaluate_mode: "embedded",
+    service: "embedded_replay_fallback",
+  };
+}
+
+function embeddedManifest(): ManifestEntry[] {
+  return DEMO_FIXTURES.manifest.map((entry) => ({ ...entry })) as ManifestEntry[];
+}
+
+function embeddedAssessment(incidentId: string): IncidentAssessment {
+  const record =
+    DEMO_FIXTURES.assessments[
+      incidentId as keyof typeof DEMO_FIXTURES.assessments
+    ];
+  if (!record) throw new Error(`No replay assessment for ${incidentId}`);
+  return { ...record } as IncidentAssessment;
+}
+
+function embeddedRadio(incidentId: string): RadioAnalysisOutput {
+  const record =
+    DEMO_FIXTURES.radio[incidentId as keyof typeof DEMO_FIXTURES.radio] ??
+    DEMO_FIXTURES.radio["INC-114"];
+  return { ...record, incident_id: incidentId } as RadioAnalysisOutput;
+}
 
 async function getJson<T>(base: string, path: string): Promise<T> {
   const response = await fetch(`${base}${path}`, { cache: "no-store" });
@@ -101,41 +132,37 @@ async function postJson<T>(base: string, path: string): Promise<T> {
 }
 
 export function checkHealth(): Promise<HealthStatus> {
-  if (USE_EMBEDDED_FIXTURES) {
-    return Promise.resolve({ status: "ok", evaluate_mode: "fixture", service: "embedded_static_demo" });
-  }
-  return getJson<HealthStatus>(BASE_URL, "/health");
+  if (!USE_REMOTE_API) return Promise.resolve(embeddedHealth());
+  return getJson<HealthStatus>(BASE_URL, "/health").catch(embeddedHealth);
 }
 
 export function fetchReplayManifest(): Promise<ManifestEntry[]> {
-  if (USE_EMBEDDED_FIXTURES) {
-    return Promise.resolve(DEMO_FIXTURES.manifest.map((entry) => ({ ...entry })) as ManifestEntry[]);
-  }
-  return getJson<ManifestEntry[]>(BASE_URL, "/v1/replay/manifest");
+  if (!USE_REMOTE_API) return Promise.resolve(embeddedManifest());
+  return getJson<ManifestEntry[]>(BASE_URL, "/v1/replay/manifest").catch(
+    embeddedManifest
+  );
 }
 
 export function fetchIncidentAssessment(
   incidentId: string
 ): Promise<IncidentAssessment> {
-  if (USE_EMBEDDED_FIXTURES) {
-    const fixture = DEMO_FIXTURES.assessments[incidentId as keyof typeof DEMO_FIXTURES.assessments];
-    if (!fixture) return Promise.reject(new Error(`No embedded assessment for ${incidentId}`));
-    return Promise.resolve({ ...fixture } as IncidentAssessment);
-  }
-  return getJson<IncidentAssessment>(BASE_URL, `/v1/incidents/${incidentId}`);
+  if (!USE_REMOTE_API) return Promise.resolve(embeddedAssessment(incidentId));
+  return getJson<IncidentAssessment>(
+    BASE_URL,
+    `/v1/incidents/${incidentId}`
+  ).catch(() => embeddedAssessment(incidentId));
 }
 
 export function analyzeRadio(incidentId: string): Promise<RadioAnalysisOutput> {
-  if (USE_EMBEDDED_FIXTURES) {
-    const fixture =
-      DEMO_FIXTURES.radio[incidentId as keyof typeof DEMO_FIXTURES.radio] ??
-      DEMO_FIXTURES.radio["INC-114"];
-    return Promise.resolve({ ...fixture, incident_id: incidentId } as RadioAnalysisOutput);
-  }
+  if (!USE_REMOTE_API) return Promise.resolve(embeddedRadio(incidentId));
   return postJson<RadioAnalysisOutput>(
     RADIO_BASE_URL,
     `/v1/radio/analyze?incident_id=${encodeURIComponent(incidentId)}`
-  );
+  ).catch(() => embeddedRadio(incidentId));
 }
 
-export { BASE_URL as CORE_API_BASE_URL, RADIO_BASE_URL as RADIO_AI_BASE_URL };
+export {
+  BASE_URL as CORE_API_BASE_URL,
+  RADIO_BASE_URL as RADIO_AI_BASE_URL,
+  USE_REMOTE_API,
+};

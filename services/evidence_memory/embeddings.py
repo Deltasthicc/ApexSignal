@@ -11,7 +11,9 @@ Tests inject their own encoder rather than downloading weights.
 
 from __future__ import annotations
 
+import hashlib
 import os
+import re
 from functools import lru_cache
 from typing import TYPE_CHECKING, Callable, Sequence
 
@@ -19,6 +21,27 @@ if TYPE_CHECKING:
     import numpy as np
 
 DEFAULT_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+FALLBACK_DIMENSIONS = 384
+
+_DOMAIN_NORMALIZATION = {
+    "loose": "rear_traction",
+    "moving": "rear_traction",
+    "snapping": "rear_traction",
+    "stepped": "rear_traction",
+    "rear": "rear_traction",
+    "power": "throttle",
+    "traction": "throttle",
+    "understeer": "front_turnin",
+    "washing": "front_turnin",
+    "turning": "front_turnin",
+    "front": "front_turnin",
+    "brakes": "brake",
+    "braking": "brake",
+    "tyres": "tyre",
+    "tires": "tyre",
+    "again": "recurrence",
+    "same": "recurrence",
+}
 
 # Takes a list of texts, returns one row per text. Anything matching this
 # can stand in for the real model.
@@ -51,6 +74,40 @@ def encode(texts: Sequence[str], *, model_name: str | None = None) -> "np.ndarra
     model = _load_model(model_name or default_model_name())
     vectors = model.encode(list(texts), convert_to_numpy=True)
     return normalize_rows(np.asarray(vectors, dtype=float))
+
+
+def encode_resilient(
+    texts: Sequence[str], *, model_name: str | None = None
+) -> "np.ndarray":
+    """Use MiniLM when installed, otherwise keep the pipeline operational."""
+    try:
+        return encode(texts, model_name=model_name)
+    except ImportError:
+        return _lexical_encode(texts)
+
+
+def _lexical_encode(texts: Sequence[str]) -> "np.ndarray":
+    """Deterministic CPU fallback when sentence-transformers is unavailable.
+
+    The fallback is deliberately modest: normalized word features, adjacent
+    token pairs, and a small F1 vocabulary map. It keeps the evidence pipeline
+    operational and testable without pretending to be the MiniLM model. The
+    production model remains the preferred path whenever it is installed.
+    """
+    import numpy as np
+
+    matrix = np.zeros((len(texts), FALLBACK_DIMENSIONS), dtype=float)
+    for row, text in enumerate(texts):
+        raw_tokens = re.findall(r"[a-z0-9]+", text.lower())
+        tokens = [_DOMAIN_NORMALIZATION.get(token, token) for token in raw_tokens]
+        features = tokens + [
+            f"{left}:{right}" for left, right in zip(tokens, tokens[1:])
+        ]
+        for feature in features:
+            digest = hashlib.blake2b(feature.encode("utf-8"), digest_size=8).digest()
+            index = int.from_bytes(digest, "little") % FALLBACK_DIMENSIONS
+            matrix[row, index] += 1.0
+    return normalize_rows(matrix)
 
 
 def normalize_rows(matrix: "np.ndarray") -> "np.ndarray":

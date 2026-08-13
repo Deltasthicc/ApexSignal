@@ -18,6 +18,16 @@ const MATERIALS = [
     desc: "Request flow, service boundaries, and the design decisions behind them.",
     href: `${REPO}/blob/main/ARCHITECTURE.md`,
   },
+  {
+    title: "Presentation Runbook",
+    desc: "The rehearsed 90-second judge flow, exact claims, and five-minute preflight.",
+    href: `${REPO}/blob/main/docs/PRESENTATION_RUNBOOK.md`,
+  },
+  {
+    title: "Project Status",
+    desc: "A precise shipped-versus-roadmap capability matrix with no hidden placeholders.",
+    href: `${REPO}/blob/main/docs/PROJECT_STATUS.md`,
+  },
 ];
 
 const TEAM = [
@@ -37,7 +47,7 @@ export function MaterialsSection() {
             Read the source
           </h2>
         </Reveal>
-        <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-5">
           {MATERIALS.map((m, i) => (
             <Reveal key={m.title} delayMs={i * 90}>
               <a

@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 
 /**
- * Radio clips are not bundled in this environment (data/audio/ ships only
- * a .gitkeep -- see contracts/api_contract.md). Rather than fake a
- * playback bar over silence, this plays the transcript through the
- * browser's own speech synthesis and says so plainly. If a real .wav for
- * this incident ever shows up at `src`, that plays instead, unlabeled.
+ * Licensed incident broadcasts are not distributed with the public replay.
+ * Rather than fake a playback bar over silence, this offers an explicitly
+ * labeled transcript voice preview. A locally supplied incident recording at
+ * `src` takes precedence automatically.
  */
 export function AudioPlayer({
   src,
@@ -66,8 +65,8 @@ export function AudioPlayer({
         {speaking ? "■" : "▶"}
       </button>
       <p className="text-[10px] leading-relaxed text-dim">
-        No broadcast clip bundled in this environment.{" "}
-        <span className="text-ink">Synthesized playback of the transcript.</span>
+        Transcript voice preview.{" "}
+        <span className="text-ink">No licensed incident broadcast is distributed.</span>
       </p>
     </div>
   );

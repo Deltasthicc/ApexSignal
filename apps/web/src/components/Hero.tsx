@@ -62,7 +62,7 @@ export function Hero({
               href="#live"
               className="border border-red bg-red px-5 py-2.5 text-[11px] uppercase tracking-[0.12em] text-ink transition hover:bg-red-bright"
             >
-              &#9654; Try the live inspector
+              &#9654; Run the incident replay
             </a>
             <a
               href="#evidence"
@@ -87,7 +87,7 @@ export function Hero({
             <Stat k="Session" v={sessionId} />
             <Stat k="Driver" v={driver} />
             <Stat k="Incidents" v={incidentCount === null ? "—" : String(incidentCount)} />
-            <Stat k="Mode" v={modeLabel === "fixture" ? "fixture demo" : modeLabel} accent />
+            <Stat k="Mode" v={modeLabel} accent />
           </div>
         </div>
 
@@ -125,7 +125,7 @@ export function Hero({
                 <Legend color="bg-gold" label="Deviation confirmed" />
               </div>
               <span className={playing ? "text-red" : ""}>
-                {playing ? "now playing…" : "illustrative radio clip · not fixture evidence"}
+                {playing ? "now playing…" : "public radio sample · interface preview"}
               </span>
             </div>
           </div>

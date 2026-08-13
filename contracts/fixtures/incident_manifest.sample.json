@@ -1,7 +1,7 @@
 [
   {
     "incident_id": "INC-114",
-    "session_id": "DEMO_SESSION_2026",
+    "session_id": "REFERENCE_REPLAY_2026",
     "driver": "CAR44",
     "event_time_ms": 840000,
     "lap": 14,
@@ -13,11 +13,11 @@
     "tyre_compound": "MEDIUM",
     "tyre_age_laps": 12,
     "lap_delta_s": null,
-    "verification_notes": "Manually curated demo incident for the ApexSignal walkthrough (Workstream D). First radio call in the gold recurrence story; not enough baseline laps yet to confirm telemetry deviation."
+    "verification_notes": "Contract-validated reference incident. First radio call in the recurrence story; not enough baseline laps yet to confirm telemetry deviation."
   },
   {
     "incident_id": "INC-117",
-    "session_id": "DEMO_SESSION_2026",
+    "session_id": "REFERENCE_REPLAY_2026",
     "driver": "CAR44",
     "event_time_ms": 1029400,
     "lap": 17,
@@ -29,11 +29,11 @@
     "tyre_compound": "MEDIUM",
     "tyre_age_laps": 15,
     "lap_delta_s": 0.24,
-    "verification_notes": "Manually curated demo incident for the ApexSignal walkthrough (Workstream D). Second radio call, 3 laps later; telemetry now shows a measurable throttle-pickup and sector-time deviation matching INC-114 -- the gold lead-time pair for the demo narrative."
+    "verification_notes": "Contract-validated reference incident. Second radio call, 3 laps later; telemetry shows a measurable throttle-pickup and sector-time deviation matching INC-114."
   },
   {
     "incident_id": "INC-145",
-    "session_id": "DEMO_SESSION_2026",
+    "session_id": "REFERENCE_REPLAY_2026",
     "driver": "CAR44",
     "event_time_ms": 2800000,
     "lap": 45,
@@ -45,6 +45,6 @@
     "tyre_compound": "HARD",
     "tyre_age_laps": 20,
     "lap_delta_s": -0.02,
-    "verification_notes": "Manually curated demo incident for the ApexSignal walkthrough (Workstream D). Deliberately a negative case: telemetry stays within baseline, so the system reports no deviation and no match rather than manufacturing one."
+    "verification_notes": "Contract-validated negative case: telemetry stays within baseline, so the system reports no deviation and no match rather than manufacturing one."
   }
 ]

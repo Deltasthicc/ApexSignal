@@ -19,16 +19,15 @@ export function SessionGrid({
     <section id="sessions" className="border-t border-rule bg-bg px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <Reveal>
-          <p className="label-red mb-3">Demo Session</p>
+          <p className="label-red mb-3">Validated Reference Replay</p>
           <h2 className="text-2xl font-medium uppercase tracking-[0.03em] text-ink">
-            Three curated incidents, one recurrence story
+            Three evidence cases, one recurrence story
           </h2>
           <p className="mt-3 max-w-2xl text-[12.5px] leading-relaxed text-dim">
-            {entries[0]?.session_id ?? "Demo session"} &middot;{" "}
-            {entries[0]?.driver ?? "—"}. Manually curated for this
-            walkthrough (see each entry&rsquo;s{" "}
-            <code className="text-teal">verification_notes</code>) — click
-            one to open it in the live inspector below.
+            {entries[0]?.session_id ?? "Reference replay"} &middot;{" "}
+            {entries[0]?.driver ?? "—"}. These deterministic records cover an
+            initial warning, a telemetry-supported recurrence, and a negative
+            control. Click one to inspect every evidence field.
           </p>
         </Reveal>
 
