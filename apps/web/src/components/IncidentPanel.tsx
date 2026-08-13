@@ -1,5 +1,4 @@
 import {
-  CORE_API_BASE_URL,
   type IncidentAssessment,
   type ManifestEntry,
   type RadioAnalysisOutput,
@@ -20,7 +19,7 @@ type Props = {
 };
 
 export function IncidentPanel({ entry, radio, assessment, pitWallMode }: Props) {
-  const audioSrc = `${CORE_API_BASE_URL}/static/${entry.audio_path}`;
+  const audioSrc = "/audio/lando-norris-fp1-tuscany.mp3";
 
   if (pitWallMode) {
     return (
@@ -34,7 +33,10 @@ export function IncidentPanel({ entry, radio, assessment, pitWallMode }: Props) 
           &ldquo;{entry.verified_transcript}&rdquo;
         </p>
         <div className="mt-5">
-          <AudioPlayer src={audioSrc} transcript={entry.verified_transcript} />
+          <AudioPlayer
+            src={audioSrc}
+            clipLabel="Lando Norris · Tuscany FP1"
+          />
         </div>
         <p className="mt-6 border-t border-rule pt-4 text-[11px] leading-relaxed text-dim">
           This is what the pit wall had before ApexSignal: the radio call and
@@ -60,7 +62,10 @@ export function IncidentPanel({ entry, radio, assessment, pitWallMode }: Props) 
 
       <div className="mt-5">
         <p className="label mb-2">Radio</p>
-        <AudioPlayer src={audioSrc} transcript={entry.verified_transcript} />
+        <AudioPlayer
+          src={audioSrc}
+          clipLabel="Lando Norris · Tuscany FP1"
+        />
         {radio === "loading" && (
           <p className="mt-3 text-xs text-dim">Analyzing transcript&hellip;</p>
         )}
