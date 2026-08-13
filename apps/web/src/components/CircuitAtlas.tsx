@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { CIRCUITS, type CircuitShape } from "@/data/circuits";
 import { Reveal } from "@/components/Reveal";
 
@@ -26,238 +26,6 @@ function pointAt(circuit: CircuitShape, fraction: number, width: number, height:
     x: padding + x * (width - padding * 2),
     y: padding + y * (height - padding * 2),
   };
-}
-
-function poseAt(
-  circuit: CircuitShape,
-  fraction: number,
-  width: number,
-  height: number,
-  padding: number
-) {
-  const points = circuit.points.map(([x, y]) => ({
-    x: padding + x * (width - padding * 2),
-    y: padding + y * (height - padding * 2),
-  }));
-  const segments = points.slice(1).map((point, index) => {
-    const previous = points[index];
-    return {
-      from: previous,
-      to: point,
-      length: Math.hypot(point.x - previous.x, point.y - previous.y),
-    };
-  });
-  const totalLength = segments.reduce((sum, segment) => sum + segment.length, 0);
-  let remaining = fraction * totalLength;
-
-  for (const segment of segments) {
-    if (remaining <= segment.length) {
-      const localFraction = segment.length === 0 ? 0 : remaining / segment.length;
-      return {
-        x: segment.from.x + (segment.to.x - segment.from.x) * localFraction,
-        y: segment.from.y + (segment.to.y - segment.from.y) * localFraction,
-        angle:
-          (Math.atan2(segment.to.y - segment.from.y, segment.to.x - segment.from.x) *
-            180) /
-          Math.PI,
-      };
-    }
-    remaining -= segment.length;
-  }
-
-  const finalSegment = segments[segments.length - 1];
-  return {
-    x: finalSegment.to.x,
-    y: finalSegment.to.y,
-    angle:
-      (Math.atan2(
-        finalSegment.to.y - finalSegment.from.y,
-        finalSegment.to.x - finalSegment.from.x
-      ) *
-        180) /
-      Math.PI,
-  };
-}
-
-const BACKDROP_LAP_DURATION_MS = 16000;
-const REDUCED_MOTION_LAP_DURATION_MS = 28000;
-const LAST_BACKDROP_CIRCUIT_KEY = "apexsignal.last-background-circuit";
-
-function randomIndex(length: number) {
-  if (length <= 1) return 0;
-  const values = new Uint32Array(1);
-  window.crypto.getRandomValues(values);
-  return values[0] % length;
-}
-
-function nextCircuitIndex(currentIndex: number | null) {
-  if (currentIndex === null) return randomIndex(CIRCUITS.length);
-  if (CIRCUITS.length <= 1) return 0;
-
-  const candidate = randomIndex(CIRCUITS.length - 1);
-  return candidate >= currentIndex ? candidate + 1 : candidate;
-}
-
-function rememberCircuit(index: number) {
-  try {
-    window.sessionStorage.setItem(LAST_BACKDROP_CIRCUIT_KEY, CIRCUITS[index].key);
-  } catch {
-    // The animation still works when browser storage is unavailable.
-  }
-}
-
-function DriverMarker({
-  circuit,
-  lapDurationMs,
-}: {
-  circuit: CircuitShape;
-  lapDurationMs: number;
-}) {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    let animationFrame = 0;
-    let lastFrameAt = 0;
-    const startedAt = window.performance.now();
-
-    const advance = (now: number) => {
-      if (now - lastFrameAt >= 1000 / 30) {
-        setProgress(Math.min((now - startedAt) / lapDurationMs, 1));
-        lastFrameAt = now;
-      }
-      if (now - startedAt < lapDurationMs) {
-        animationFrame = window.requestAnimationFrame(advance);
-      }
-    };
-
-    animationFrame = window.requestAnimationFrame(advance);
-    return () => window.cancelAnimationFrame(animationFrame);
-  }, [lapDurationMs]);
-
-  const pose = useMemo(
-    () => poseAt(circuit, progress, 1000, 700, 70),
-    [circuit, progress]
-  );
-
-  return (
-    <g transform={`translate(${pose.x} ${pose.y}) rotate(${pose.angle})`}>
-      <circle r="26" fill="#e10600" fillOpacity="0.13" className="site-driver-halo" />
-      <path
-        d="M -13 -7 L 5 -7 L 15 -3.5 L 15 3.5 L 5 7 L -13 7 L -17 3 L -17 -3 Z"
-        fill="#e10600"
-        stroke="#f0f0f0"
-        strokeWidth="1.5"
-      />
-      <rect x="-11" y="-10" width="4" height="20" rx="1" fill="#e10600" />
-      <circle cx="3" cy="0" r="2.4" fill="#ffd60a" />
-      <path d="M 8 -5 L 14 0 L 8 5" fill="none" stroke="#f0f0f0" strokeWidth="1.3" />
-    </g>
-  );
-}
-
-export function AnimatedCircuitBackground() {
-  const [circuitIndex, setCircuitIndex] = useState<number | null>(null);
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    let previousIndex: number | null = null;
-    try {
-      const previousKey = window.sessionStorage.getItem(LAST_BACKDROP_CIRCUIT_KEY);
-      const storedIndex = CIRCUITS.findIndex((circuit) => circuit.key === previousKey);
-      previousIndex = storedIndex >= 0 ? storedIndex : null;
-    } catch {
-      // Fall back to an unconstrained first pick when storage is unavailable.
-    }
-
-    const nextIndex = nextCircuitIndex(previousIndex);
-    rememberCircuit(nextIndex);
-    setCircuitIndex(nextIndex);
-  }, []);
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updatePreference = () => setReducedMotion(media.matches);
-    updatePreference();
-    media.addEventListener("change", updatePreference);
-    return () => media.removeEventListener("change", updatePreference);
-  }, []);
-
-  useEffect(() => {
-    const lapDurationMs = reducedMotion
-      ? REDUCED_MOTION_LAP_DURATION_MS
-      : BACKDROP_LAP_DURATION_MS;
-    const interval = window.setInterval(() => {
-      setCircuitIndex((current) => {
-        const nextIndex = nextCircuitIndex(current);
-        rememberCircuit(nextIndex);
-        return nextIndex;
-      });
-    }, lapDurationMs);
-    return () => window.clearInterval(interval);
-  }, [reducedMotion]);
-
-  const circuit = circuitIndex === null ? null : CIRCUITS[circuitIndex];
-  const path = useMemo(
-    () => (circuit ? circuitPath(circuit, 1000, 700, 70) : ""),
-    [circuit]
-  );
-  const lapDurationMs = reducedMotion
-    ? REDUCED_MOTION_LAP_DURATION_MS
-    : BACKDROP_LAP_DURATION_MS;
-
-  if (!circuit) return null;
-
-  return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-40 overflow-hidden mix-blend-screen">
-      <div key={circuit.key} className="site-circuit-scene relative h-full w-full">
-        <svg
-          viewBox="0 0 1000 700"
-          preserveAspectRatio="xMidYMid slice"
-          className="h-full w-full"
-        >
-          <defs>
-            <filter id="site-driver-glow" x="-100%" y="-100%" width="300%" height="300%">
-              <feGaussianBlur stdDeviation="8" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-          <g className="site-circuit-track">
-            <path
-              d={path}
-              fill="none"
-              stroke="#f0f0f0"
-              strokeOpacity="0.72"
-              strokeWidth="10"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d={path}
-              fill="none"
-              stroke="#e10600"
-              strokeOpacity="0.9"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              pathLength="1000"
-              className="site-circuit-trace"
-            />
-          </g>
-          <g className="site-driver-layer" filter="url(#site-driver-glow)">
-            <DriverMarker circuit={circuit} lapDurationMs={lapDurationMs} />
-          </g>
-        </svg>
-        <div className="site-circuit-label absolute bottom-7 right-7 border-r border-red pr-3 text-right uppercase tracking-[0.18em] text-ink">
-          <p className="text-[8px] text-red">background lap · {circuit.code}</p>
-          <p className="mt-1 text-[10px]">{circuit.name}</p>
-          <p className="mt-1 text-[7px] text-dim">{circuit.location}</p>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export function CircuitSignalGraphic({ playing = false }: { playing?: boolean }) {
@@ -385,12 +153,18 @@ export function CircuitAtlasSection() {
               <p className="label-red mb-3">Circuit context · source geometry</p>
               <h2 className="text-2xl font-medium uppercase tracking-[0.03em] text-ink">Recognisable at a glance</h2>
               <p className="mt-4 max-w-2xl text-[12.5px] leading-relaxed text-dim">
-                Twenty-five circuit centerlines sampled from an open motorsport geometry database—not invented SVG loops. Uniform scaling preserves every silhouette. The atlas provides recognisable circuit context while the inspector runs a deterministic reference replay.
+                Twenty-five circuit centerlines sampled from an open motorsport
+                geometry database—not invented SVG loops. Twenty-one maps also
+                rotate through complete, source-backed Formula 1 race recaps;
+                map-only venues remain in the atlas when comparable F1 lap-order
+                data does not exist.
               </p>
             </div>
             <div className="border-l border-red pl-5">
               <p className="text-4xl font-light tracking-[-0.05em] text-ink">25</p>
-              <p className="mt-1 text-[9px] uppercase tracking-[0.18em] text-dim">source centerlines<br />one consistent atlas</p>
+              <p className="mt-1 text-[9px] uppercase tracking-[0.18em] text-dim">
+                source centerlines<br />21 race replays · 1,284 laps
+              </p>
             </div>
           </div>
         </Reveal>
@@ -425,7 +199,12 @@ export function CircuitAtlasSection() {
         </div>
 
         <p className="mt-5 text-[9px] leading-relaxed tracking-[0.08em] text-dim">
-          Geometry derived from TUMFTM/racetrack-database (LGPL-3.0). Centerline lengths are computed from source coordinates and may differ slightly from official homologated lap distances.
+          Geometry derived from TUMFTM/racetrack-database (LGPL-3.0).
+          Historical grid, classification and per-lap order are bundled from the
+          Jolpica/Ergast archive. Between-lap map motion is interpolated for the
+          recap and is not presented as GPS telemetry. Centerline lengths are
+          computed from source coordinates and may differ slightly from official
+          homologated lap distances.
         </p>
       </div>
     </section>

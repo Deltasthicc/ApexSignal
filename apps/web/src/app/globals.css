@@ -92,72 +92,17 @@ body {
   transition: stroke 180ms ease, filter 180ms ease;
 }
 
-@keyframes site-circuit-zoom {
-  0% {
-    transform: scale(1.025);
-  }
-  100% {
-    transform: scale(1);
-  }
+.race-replay-shell {
+  opacity: 0;
+  transition: opacity 3.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.site-circuit-scene {
-  animation: site-circuit-zoom 16s ease-in-out forwards;
-  will-change: transform;
+.race-replay-shell.is-visible {
+  opacity: 1;
 }
 
-@keyframes site-circuit-track-fade {
-  0%, 100% { opacity: 0; }
-  9%, 86% { opacity: 0.16; }
-}
-
-@keyframes site-driver-fade {
-  0%, 100% { opacity: 0; }
-  7%, 90% { opacity: 0.72; }
-}
-
-@keyframes site-circuit-label-fade {
-  0%, 100% { opacity: 0; }
-  9%, 86% { opacity: 0.32; }
-}
-
-.site-circuit-track {
-  animation: site-circuit-track-fade 16s ease-in-out forwards;
-}
-
-.site-driver-layer {
-  animation: site-driver-fade 16s ease-in-out forwards;
-}
-
-.site-circuit-label {
-  animation: site-circuit-label-fade 16s ease-in-out forwards;
-}
-
-.site-circuit-trace {
-  stroke-dasharray: 7 11;
-  animation: site-circuit-flow 2.8s linear infinite;
-}
-
-@keyframes site-circuit-flow {
-  to {
-    stroke-dashoffset: -36;
-  }
-}
-
-.site-driver-halo {
-  animation: site-driver-pulse 1.4s ease-in-out infinite;
-}
-
-@keyframes site-driver-pulse {
-  0%,
-  100% {
-    transform: scale(0.75);
-    opacity: 0.45;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
+.race-replay-layer {
+  opacity: 0.82;
 }
 
 button:hover .circuit-card-line,
@@ -233,32 +178,11 @@ button[aria-pressed="true"] .circuit-card-line {
 
   .circuit-draw,
   .circuit-card-line,
-  .hero-line,
-  .site-circuit-trace {
+  .hero-line {
     stroke-dashoffset: 0;
   }
 
-  .site-circuit-scene {
-    animation: none !important;
-    transform: none;
-  }
-
-  .site-circuit-track {
-    animation: none !important;
-    opacity: 0.16;
-  }
-
-  .site-driver-layer {
-    animation: none !important;
-    opacity: 0.72;
-  }
-
-  .site-circuit-label {
-    animation: none !important;
-    opacity: 0.32;
-  }
-
-  .site-driver-halo {
-    animation: none !important;
+  .race-replay-shell {
+    transition-duration: 3.2s !important;
   }
 }
