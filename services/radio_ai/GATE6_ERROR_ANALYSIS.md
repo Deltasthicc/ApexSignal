@@ -384,3 +384,110 @@ example utterances per category averaged together, not just the
 taxonomy description text alone) before concluding embeddings are the
 answer -- this run used the cheapest possible version of the idea and
 still beat the NLI baseline, which is itself informative.
+
+**2026-08-14, adopted in production** (see `VALIDATION_GATES.md` gate
+6d): the embedding-prototype backend above is now what
+`app/complaint_classifier.py::classify()` actually runs
+(`CLASSIFIER_BACKEND=embedding`). Ported the exact decision logic from
+this script, then re-verified production `classify()` reproduces
+macro-F1=0.4538 (rounds to 0.454) with identical per-class F1 -- the
+same logic, confirmed, not re-derived from this writeup.
+
+## 2026-08-14, Part 2: pushing past 0.454 (production baseline)
+
+Three more things tried, in the order suggested. All measured directly
+against the 58-example benchmark, same rigor as everything above.
+
+### Item 1: richer prototypes (description + real example text) -- REJECTED, small regression
+
+`scripts/experiment_richer_prototypes.py`. Each category's prototype
+becomes the description embedding averaged with embeddings of its
+*other* already-labeled examples from the same 58-example set --
+**leave-one-out**, not naive averaging: while scoring example i, its
+own text is never part of its own category's prototype (that would be
+scoring "does this match itself," inflating the number for a reason
+that wouldn't generalize to a new clip). `TYRE_GRIP_DEGRADATION` (n=0)
+and, for each individual example, whichever category has no *other*
+same-category example left after holdout, correctly falls back to the
+description-only prototype -- 58 such fallbacks total, all attributable
+to `TYRE_GRIP_DEGRADATION`'s zero examples (58 examples x 1 category
+with zero others = 58, not a bug).
+
+**Result: macro-F1=0.442 at best margin 0.04 -- a real -1.2pp
+regression** vs. the production description-only baseline (0.454). Not
+uniform: `MECHANICAL_OTHER` improved (0.500 vs 0.286) but
+`FRONT_TURNIN_BRAKE` collapsed to F1=0.000 (was 0.333) -- likely
+because n=2 is too thin for leave-one-out averaging to help; averaging
+with a single noisy other example can shift the prototype in an
+unhelpful direction rather than genuinely generalizing. Net effect
+roughly cancels out to a small loss. **Rejected** -- richer prototypes
+built from this specific 58-example set don't help; more/better
+labeled data per category, not more averaging tricks on the same thin
+data, is the likely real lever (see item 4).
+
+### Item 2: ensemble of NLI-xsmall and embedding -- REJECTED, despite genuinely disjoint mistakes
+
+Checked the actual mistake sets before building anything, per this
+gate's own rule ("only worth trying if the mistake lists are actually
+different"): xsmall @ 0.15 has 21 mistakes, embedding @ 0.16 has 17,
+and only **9 overlap** -- 20 of 29 unique wrong examples (69%) are
+genuinely disjoint, comfortably past the bar for trying an ensemble.
+
+Tested a simple, predefined rule (decided before looking at results,
+specifically to avoid overfitting the rule itself to this exact set):
+if both models agree, use it; if one says a real category and the
+other says `NO_COMPLAINT`, trust the real-category call; if both name
+*different* real categories, default to embedding's (the higher
+aggregate scorer, the actual production choice).
+
+**Result: macro-F1=0.432 -- a real -2.2pp regression vs. embedding
+alone** (though still beats xsmall alone's 0.393). `NO_COMPLAINT` F1
+dropped to 0.722 (from embedding's 0.805) -- "any positive detection
+wins" picks up genuine disjoint catches, but just as often it also
+promotes one model's *wrong* category claim over the other's *correct*
+`NO_COMPLAINT`, since disjoint mistakes include cases where one model
+is right and the other is confidently wrong, not just cases where they
+usefully complement each other. **Rejected.** Disjoint mistakes were a
+necessary condition for an ensemble to be worth trying, not a
+sufficient one -- this specific combination rule doesn't turn that
+disjointness into a net win.
+
+### Item 3: margin robustness -- reported plainly, no meaningful cross-validation possible
+
+The adopted margin (0.16) sits on a visibly noisy stretch of the sweep
+curve:
+
+```
+margin  macro-F1
+0.12    0.434
+0.14    0.446
+0.16    0.454   <- adopted
+0.18    0.384
+0.20    0.400
+```
+
+Considered k-fold cross-validation per the gate's suggestion, but it
+isn't meaningful here: `FRONT_TURNIN_BRAKE` has exactly 2 examples and
+`TYRE_GRIP_DEGRADATION` has 0 -- there's no way to stratify even a
+small number of folds without leaving a category entirely absent from
+some folds' training data, which wouldn't measure robustness so much
+as measure the absence of data. Reporting the neighborhood plainly
+instead, per the gate's own fallback instruction: **0.16 is a real
+local best, not a stable plateau** -- treat the margin as "somewhere
+in 0.12-0.16," not as a precise, load-bearing constant, until there's
+enough labeled data to cross-validate for real.
+
+### Item 4: honest conclusion -- plateaued, and the real bottleneck is named
+
+Items 1-3 all either regressed or didn't survive scrutiny. **This is
+the real ceiling of what's achievable by modeling tricks on the
+current 58-example set, not a gap to keep chasing with a fifth
+architecture.** The actual bottleneck is the labeled data itself: 44 of
+58 examples are `NO_COMPLAINT`, `FRONT_TURNIN_BRAKE` has 2,
+`TYRE_GRIP_DEGRADATION` has 0. No amount of prototype engineering,
+ensembling, or margin tuning can teach a model to recognize a category
+it has zero or two real examples of. Gate 6a's 0.80 target very likely
+needs a larger, more balanced labeled set before it needs another
+modeling idea -- see `VALIDATION_GATES.md` gate 6 "things worth
+trying" item 3 (more labeled data), still not attempted this session
+for the same standing reason: it needs a human, not code.

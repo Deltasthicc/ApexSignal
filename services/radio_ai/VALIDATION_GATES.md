@@ -157,6 +157,16 @@ Net effect on this specific 20-clip set: embedding is **meaningfully more conser
 
 `data/radio_analysis/*.json` (repo root) was already flagged stale from the pre-bugfix classifier run; it is now stale in a second, compounding way (wrong backend entirely, not just the pre-fix bug) if anyone regenerates it without re-reading this section first. Still not regenerated in this pass — no real curated incident audio exists yet to do so honestly.
 
+### 6e — 2026-08-14, Part 2: pushed past 0.454, genuinely plateaued — full detail in `GATE6_ERROR_ANALYSIS.md`
+
+Three more attempts, same rigor, all measured directly:
+
+1. **Richer prototypes** (description + leave-one-out real example text): macro-F1=0.442 — a real **-1.2pp regression**. `MECHANICAL_OTHER` improved (0.500) but `FRONT_TURNIN_BRAKE` collapsed (0.000, was 0.333) — n=2 is too thin for averaging to help. **Rejected.**
+2. **Ensemble (NLI-xsmall + embedding)**: checked first whether their mistakes actually overlap — only 9/29 unique wrong examples do (69% disjoint, comfortably past the bar for trying this). Tested a predefined combination rule anyway: macro-F1=0.432 — a real **-2.2pp regression** vs. embedding alone (though still beats xsmall alone). Disjoint mistakes were necessary but not sufficient for this to help. **Rejected.**
+3. **Margin robustness**: the adopted margin (0.16) sits on a genuinely noisy stretch (0.14→0.446, 0.16→0.454, 0.18→0.384). K-fold cross-validation isn't meaningful here (`FRONT_TURNIN_BRAKE` n=2, `TYRE_GRIP_DEGRADATION` n=0 — can't stratify a fold). Reported the neighborhood plainly instead: **treat 0.16 as "somewhere in 0.12-0.16," not a precise constant.**
+
+**Honest conclusion, not a fifth architecture chased in diminishing returns**: this is the real ceiling of what modeling tricks can do on the current 58-example set. The actual bottleneck is the labeled data itself — 44/58 `NO_COMPLAINT`, 2 `FRONT_TURNIN_BRAKE`, 0 `TYRE_GRIP_DEGRADATION`. Gate 6a's 0.80 target needs a larger, more balanced labeled set before it needs another modeling idea. Still not attempted this session for the standing reason: it needs a human, not code.
+
 ## Gate 7 — Day 5 holdout
 
 Keep ≥ 20 clips untouched by any threshold tuning. Run them once,
