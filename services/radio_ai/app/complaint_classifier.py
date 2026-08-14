@@ -60,7 +60,19 @@ def classify(transcript: str) -> tuple[str | None, float | None]:
         hypothesis_template=ClassifierConfig.HYPOTHESIS_TEMPLATE,
         multi_label=True,
     )
-    scored = dict(zip(result["labels"], result["scores"]))
+    # result["labels"]/["scores"] come back keyed by the long descriptive
+    # hypothesis text we passed in (that's what candidate_labels was),
+    # re-sorted by score -- NOT by our short taxonomy keys. Map back to
+    # short keys via the hypothesis text, not by assuming the pipeline
+    # echoes our keys directly (it doesn't -- this was silently always
+    # returning None/None before, since every scored.get(short_key, 0.0)
+    # lookup below missed and fell back to 0.0. See VALIDATION_GATES.md
+    # gate 6/7 for how this was found.)
+    hypothesis_to_label = dict(zip(hypotheses, labels))
+    scored = {
+        hypothesis_to_label[hyp]: score
+        for hyp, score in zip(result["labels"], result["scores"])
+    }
 
     if scored.get("NO_COMPLAINT", 0.0) >= ClassifierConfig.NULL_THRESHOLD:
         top_non_null = max(

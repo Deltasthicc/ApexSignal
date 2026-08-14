@@ -36,6 +36,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.config import ClassifierConfig, ModelConfig  # noqa: E402
 
 LABELS = list(ClassifierConfig.TAXONOMY.keys())  # includes NO_COMPLAINT
+HYPOTHESES = [ClassifierConfig.TAXONOMY[label] for label in LABELS]
+HYPOTHESIS_TO_LABEL = dict(zip(HYPOTHESES, LABELS))
 THRESHOLD_SWEEP = [round(0.05 * i, 2) for i in range(1, 13)]  # 0.05 .. 0.60
 
 
@@ -43,14 +45,26 @@ def score_transcript(pipeline_obj, transcript: str) -> dict[str, float]:
     """One model call -> raw per-label scores. Cache this; it's the
     expensive part. Everything threshold-dependent happens on the
     cached result, not here.
+
+    Passes the taxonomy's long descriptive text as candidate_labels
+    (matching app/complaint_classifier.py's actual production
+    behavior, and the project's own stated design -- "the taxonomy
+    definition itself becomes the classifier input"), not the bare
+    short keys this used to pass. Every Gate 6 number measured before
+    this fix (the 0.15 threshold, both rejected experiments) was
+    against a hypothesis construction that DIDN'T match production --
+    see VALIDATION_GATES.md gate 6/7 for how the mismatch was found.
     """
     result = pipeline_obj(
         transcript,
-        LABELS,
+        HYPOTHESES,
         hypothesis_template=ClassifierConfig.HYPOTHESIS_TEMPLATE,
         multi_label=True,
     )
-    return dict(zip(result["labels"], result["scores"]))
+    return {
+        HYPOTHESIS_TO_LABEL[hyp]: score
+        for hyp, score in zip(result["labels"], result["scores"])
+    }
 
 
 def decide(scored: dict[str, float], null_threshold: float) -> str:

@@ -15,11 +15,11 @@
     "complaint_category": null,
     "category_confidence": null,
     "timing_s": {
-      "preprocess": 0.287,
-      "asr": 0.279,
-      "tone": 0.18,
-      "classify": 0.394,
-      "total": 1.14
+      "preprocess": 0.32,
+      "asr": 0.234,
+      "tone": 0.145,
+      "classify": 0.303,
+      "total": 1.002
     }
   },
   {
@@ -39,10 +39,10 @@
     "category_confidence": null,
     "timing_s": {
       "preprocess": 0.053,
-      "asr": 0.14,
+      "asr": 0.136,
       "tone": 0.012,
-      "classify": 0.046,
-      "total": 0.251
+      "classify": 0.047,
+      "total": 0.248
     }
   },
   {
@@ -58,14 +58,14 @@
       "Recording_Quality": 1.6922,
       "Background_Noise": 1.0831
     },
-    "complaint_category": null,
-    "category_confidence": null,
+    "complaint_category": "FRONT_TURNIN_BRAKE",
+    "category_confidence": 0.9626,
     "timing_s": {
-      "preprocess": 0.037,
-      "asr": 0.12,
+      "preprocess": 0.036,
+      "asr": 0.13,
       "tone": 0.012,
       "classify": 0.046,
-      "total": 0.215
+      "total": 0.225
     }
   },
   {
@@ -81,14 +81,14 @@
       "Recording_Quality": 1.8255,
       "Background_Noise": 0.9815
     },
-    "complaint_category": null,
-    "category_confidence": null,
+    "complaint_category": "MECHANICAL_OTHER",
+    "category_confidence": 0.9832,
     "timing_s": {
-      "preprocess": 0.083,
-      "asr": 0.149,
-      "tone": 0.012,
+      "preprocess": 0.081,
+      "asr": 0.157,
+      "tone": 0.013,
       "classify": 0.046,
-      "total": 0.29
+      "total": 0.297
     }
   },
   {
@@ -104,14 +104,14 @@
       "Recording_Quality": 1.8948,
       "Background_Noise": 0.8361
     },
-    "complaint_category": null,
-    "category_confidence": null,
+    "complaint_category": "MECHANICAL_OTHER",
+    "category_confidence": 0.9557,
     "timing_s": {
       "preprocess": 0.044,
-      "asr": 0.104,
+      "asr": 0.115,
       "tone": 0.012,
       "classify": 0.046,
-      "total": 0.207
+      "total": 0.217
     }
   },
   {
@@ -127,14 +127,14 @@
       "Recording_Quality": 1.5908,
       "Background_Noise": 1.0526
     },
-    "complaint_category": null,
-    "category_confidence": null,
+    "complaint_category": "MECHANICAL_OTHER",
+    "category_confidence": 0.9444,
     "timing_s": {
-      "preprocess": 0.06,
-      "asr": 0.12,
+      "preprocess": 0.059,
+      "asr": 0.128,
       "tone": 0.012,
-      "classify": 0.045,
-      "total": 0.238
+      "classify": 0.046,
+      "total": 0.245
     }
   },
   {
@@ -154,10 +154,10 @@
     "category_confidence": null,
     "timing_s": {
       "preprocess": 0.038,
-      "asr": 0.101,
+      "asr": 0.097,
       "tone": 0.012,
-      "classify": 0.045,
-      "total": 0.196
+      "classify": 0.046,
+      "total": 0.193
     }
   },
   {
@@ -177,10 +177,10 @@
     "category_confidence": null,
     "timing_s": {
       "preprocess": 0.021,
-      "asr": 0.064,
+      "asr": 0.063,
       "tone": 0.012,
       "classify": 0.046,
-      "total": 0.143
+      "total": 0.142
     }
   },
   {
@@ -196,14 +196,14 @@
       "Recording_Quality": 1.8246,
       "Background_Noise": 0.9794
     },
-    "complaint_category": null,
-    "category_confidence": null,
+    "complaint_category": "MECHANICAL_OTHER",
+    "category_confidence": 0.9547,
     "timing_s": {
       "preprocess": 0.138,
-      "asr": 0.271,
+      "asr": 0.273,
       "tone": 0.013,
-      "classify": 0.046,
-      "total": 0.468
+      "classify": 0.047,
+      "total": 0.471
     }
   },
   {
@@ -222,11 +222,11 @@
     "complaint_category": null,
     "category_confidence": null,
     "timing_s": {
-      "preprocess": 0.056,
-      "asr": 0.127,
+      "preprocess": 0.055,
+      "asr": 0.113,
       "tone": 0.012,
-      "classify": 0.045,
-      "total": 0.24
+      "classify": 0.046,
+      "total": 0.227
     }
   },
   {
@@ -246,10 +246,10 @@
     "category_confidence": null,
     "timing_s": {
       "preprocess": 0.044,
-      "asr": 0.109,
-      "tone": 0.012,
+      "asr": 0.112,
+      "tone": 0.013,
       "classify": 0.046,
-      "total": 0.211
+      "total": 0.214
     }
   },
   {
@@ -265,14 +265,14 @@
       "Recording_Quality": 1.8813,
       "Background_Noise": 0.9411
     },
-    "complaint_category": null,
-    "category_confidence": null,
+    "complaint_category": "MECHANICAL_OTHER",
+    "category_confidence": 0.6569,
     "timing_s": {
-      "preprocess": 0.083,
+      "preprocess": 0.082,
       "asr": 0.154,
       "tone": 0.013,
-      "classify": 0.045,
-      "total": 0.295
+      "classify": 0.046,
+      "total": 0.294
     }
   },
   {
@@ -292,10 +292,10 @@
     "category_confidence": null,
     "timing_s": {
       "preprocess": 0.049,
-      "asr": 0.085,
+      "asr": 0.091,
       "tone": 0.012,
-      "classify": 0.046,
-      "total": 0.193
+      "classify": 0.047,
+      "total": 0.199
     }
   },
   {
@@ -317,7 +317,7 @@
       "preprocess": 0.039,
       "asr": 0.097,
       "tone": 0.012,
-      "classify": 0.045,
+      "classify": 0.046,
       "total": 0.194
     }
   },
@@ -338,10 +338,10 @@
     "category_confidence": null,
     "timing_s": {
       "preprocess": 0.054,
-      "asr": 0.095,
-      "tone": 0.012,
-      "classify": 0.045,
-      "total": 0.207
+      "asr": 0.106,
+      "tone": 0.013,
+      "classify": 0.046,
+      "total": 0.219
     }
   },
   {
@@ -357,14 +357,14 @@
       "Recording_Quality": 1.9548,
       "Background_Noise": 0.5336
     },
-    "complaint_category": null,
-    "category_confidence": null,
+    "complaint_category": "MECHANICAL_OTHER",
+    "category_confidence": 0.9555,
     "timing_s": {
       "preprocess": 0.02,
-      "asr": 0.066,
+      "asr": 0.067,
       "tone": 0.012,
-      "classify": 0.045,
-      "total": 0.144
+      "classify": 0.046,
+      "total": 0.145
     }
   },
   {
@@ -380,14 +380,14 @@
       "Recording_Quality": 1.9865,
       "Background_Noise": 0.8578
     },
-    "complaint_category": null,
-    "category_confidence": null,
+    "complaint_category": "MECHANICAL_OTHER",
+    "category_confidence": 0.96,
     "timing_s": {
       "preprocess": 0.083,
-      "asr": 0.11,
-      "tone": 0.012,
-      "classify": 0.046,
-      "total": 0.251
+      "asr": 0.114,
+      "tone": 0.013,
+      "classify": 0.047,
+      "total": 0.256
     }
   },
   {
@@ -406,11 +406,11 @@
     "complaint_category": null,
     "category_confidence": null,
     "timing_s": {
-      "preprocess": 0.048,
+      "preprocess": 0.051,
       "asr": 0.077,
       "tone": 0.012,
-      "classify": 0.046,
-      "total": 0.183
+      "classify": 0.048,
+      "total": 0.188
     }
   },
   {
@@ -426,14 +426,14 @@
       "Recording_Quality": 1.7656,
       "Background_Noise": 0.9307
     },
-    "complaint_category": null,
-    "category_confidence": null,
+    "complaint_category": "MECHANICAL_OTHER",
+    "category_confidence": 0.9809,
     "timing_s": {
-      "preprocess": 0.09,
-      "asr": 0.214,
+      "preprocess": 0.091,
+      "asr": 0.199,
       "tone": 0.012,
       "classify": 0.046,
-      "total": 0.362
+      "total": 0.349
     }
   },
   {
@@ -449,14 +449,14 @@
       "Recording_Quality": 2.4153,
       "Background_Noise": 0.288
     },
-    "complaint_category": null,
-    "category_confidence": null,
+    "complaint_category": "MECHANICAL_OTHER",
+    "category_confidence": 0.9889,
     "timing_s": {
       "preprocess": 0.057,
-      "asr": 0.072,
+      "asr": 0.067,
       "tone": 0.012,
-      "classify": 0.045,
-      "total": 0.187
+      "classify": 0.046,
+      "total": 0.182
     }
   }
 ]

@@ -24,6 +24,8 @@ from app.config import ClassifierConfig, ModelConfig  # noqa: E402
 from benchmark_classifier import LABELS, compute_f1  # noqa: E402
 
 REAL_CATEGORIES = [l for l in LABELS if l != "NO_COMPLAINT"]
+REAL_CATEGORY_HYPOTHESES = [ClassifierConfig.TAXONOMY[l] for l in REAL_CATEGORIES]
+REAL_HYPOTHESIS_TO_LABEL = dict(zip(REAL_CATEGORY_HYPOTHESES, REAL_CATEGORIES))
 
 STAGE1_HYPOTHESIS = "This message {}."
 STAGE1_LABELS = ["describes a problem with the car", "is routine radio communication with no complaint"]
@@ -69,10 +71,14 @@ def main(worksheet_path: str) -> None:
 
         # Stage 2: which of the 5 real categories -- single-label over
         # just those 5, argmax (we've already decided it IS a complaint).
+        # Uses the taxonomy's rich descriptive text as candidate_labels,
+        # matching production (app/complaint_classifier.py) -- passing
+        # bare short keys here was the same construction mismatch fixed
+        # there and in benchmark_classifier.py.
         stage2 = classifier(
-            transcript, REAL_CATEGORIES, hypothesis_template=ClassifierConfig.HYPOTHESIS_TEMPLATE, multi_label=False
+            transcript, REAL_CATEGORY_HYPOTHESES, hypothesis_template=ClassifierConfig.HYPOTHESIS_TEMPLATE, multi_label=False
         )
-        top_category = stage2["labels"][0]  # pipeline sorts by score descending
+        top_category = REAL_HYPOTHESIS_TO_LABEL[stage2["labels"][0]]  # pipeline sorts by score descending
         predictions.append((true_label, top_category))
 
     per_class_f1, macro_f1 = compute_f1(predictions)

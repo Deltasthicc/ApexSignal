@@ -169,8 +169,14 @@ class ClassifierConfig:
     ]
 
     # Calibrated from the Gate 6 benchmark (58 human-labeled transcripts,
-    # see VALIDATION_GATES.md gate 6): swept 0.05-0.60 against real
-    # labels, 0.15 was the genuine best point (macro-F1 0.356 vs 0.326
-    # at the old 0.5 default). n=58, one dataset -- revisit as more
-    # labeled transcripts accumulate, same caveat as the tone thresholds.
-    NULL_THRESHOLD = float(os.environ.get("CLASSIFIER_NULL_THRESHOLD", "0.15"))
+    # see VALIDATION_GATES.md gate 6). The first calibration pass (0.15)
+    # was measured against a benchmark_classifier.py that didn't match
+    # this module's actual candidate-label construction (bare taxonomy
+    # keys vs. the real descriptive hypotheses complaint_classifier.py
+    # uses) -- fixed 2026-08-14, re-swept, 0.45 is the genuine best point
+    # under the corrected methodology (macro-F1 0.258). n=58, one dataset
+    # -- revisit as more labeled transcripts accumulate. Also worth
+    # knowing: this same re-sweep found deberta-v3-xsmall now outperforms
+    # this model (macro-F1 0.393 @ threshold 0.15) -- see gate 6c, not
+    # acted on without a human decision.
+    NULL_THRESHOLD = float(os.environ.get("CLASSIFIER_NULL_THRESHOLD", "0.45"))
