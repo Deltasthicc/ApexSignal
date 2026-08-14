@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r services/radio_ai/requirements.txt
-      - run: pytest services/radio_ai/tests
+      - run: pytest tests
         working-directory: services/radio_ai
 
   core_api:
@@ -39,7 +39,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r services/core_api/requirements.txt
-      - run: pytest services/core_api/tests
+      - run: pytest tests
         working-directory: services/core_api
 
   web:
