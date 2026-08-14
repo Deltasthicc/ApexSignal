@@ -22,32 +22,38 @@ MAX_POINTS = 88
 
 # Copy stays descriptive and stable rather than claiming current-calendar
 # status. Shape notes identify the visual landmarks used to recognize a map.
-META = {
-    "Melbourne": ("Albert Park", "Melbourne, Australia", "AUS", "Lakeside semi-street loop with fast direction changes."),
-    "Spa": ("Spa-Francorchamps", "Stavelot, Belgium", "BEL", "Long Ardennes lap, steep Eau Rouge climb and sweeping back half."),
-    "Monza": ("Autodromo Nazionale Monza", "Monza, Italy", "ITA", "Long straights, compact chicanes and the Parabolica arc."),
-    "Silverstone": ("Silverstone Circuit", "Silverstone, United Kingdom", "GBR", "Angular high-speed outline shaped by Maggotts and Becketts."),
-    "Suzuka": ("Suzuka Circuit", "Suzuka, Japan", "JPN", "The unmistakable figure-eight with Esses and Spoon curve."),
-    "SaoPaulo": ("Interlagos", "Sao Paulo, Brazil", "BRA", "Compact anti-clockwise loop with a long uphill final sweep."),
-    "Sakhir": ("Bahrain International Circuit", "Sakhir, Bahrain", "BHR", "Wide desert layout built around straights and heavy braking zones."),
-    "Austin": ("Circuit of the Americas", "Austin, United States", "USA", "Uphill Turn 1, flowing Esses and a long back straight."),
-    "Catalunya": ("Circuit de Barcelona-Catalunya", "Montmelo, Spain", "ESP", "Balanced reference lap with a long main straight and broad final sector."),
-    "Spielberg": ("Red Bull Ring", "Spielberg, Austria", "AUT", "Short Alpine lap with three straights and a compact downhill return."),
-    "Zandvoort": ("Circuit Zandvoort", "Zandvoort, Netherlands", "NED", "Tight coastal ribbon bookended by distinctive banked turns."),
-    "Montreal": ("Circuit Gilles Villeneuve", "Montreal, Canada", "CAN", "Stop-start island circuit with long straights and quick chicanes."),
-    "MexicoCity": ("Autodromo Hermanos Rodriguez", "Mexico City, Mexico", "MEX", "Long opening straight feeding a technical stadium section."),
-    "Budapest": ("Hungaroring", "Mogyorod, Hungary", "HUN", "Continuous, tightly linked corners with very little recovery time."),
-    "Shanghai": ("Shanghai International Circuit", "Shanghai, China", "CHN", "Recognisable opening snail and an extended back straight."),
-    "YasMarina": ("Yas Marina Circuit", "Abu Dhabi, United Arab Emirates", "UAE", "Marina-side loop combining long straights with a compact final sector."),
-    "Sepang": ("Sepang International Circuit", "Sepang, Malaysia", "MAS", "Broad, flowing layout framed by two parallel long straights."),
-    "Hockenheim": ("Hockenheimring", "Hockenheim, Germany", "GER", "Long hairpin run linked to the compact stadium complex."),
-    "Nuerburgring": ("Nuerburgring GP-Strecke", "Nurburg, Germany", "GER", "Modern Grand Prix loop with a tight arena opening sector."),
-    "Sochi": ("Sochi Autodrom", "Sochi, Russia", "RUS", "Olympic Park street layout defined by its long constant-radius turn."),
-    "BrandsHatch": ("Brands Hatch", "West Kingsdown, United Kingdom", "GBR", "Compact natural-amphitheatre circuit with a plunging opening bend."),
-    "IMS": ("Indianapolis Road Course", "Indianapolis, United States", "USA", "Infield road course enclosed by the Speedway's rectangular oval."),
-    "MoscowRaceway": ("Moscow Raceway", "Volokolamsk, Russia", "RUS", "Technical modern circuit with a dense, folded infield."),
-    "Norisring": ("Norisring", "Nuremberg, Germany", "GER", "Very short street circuit formed by two hairpins and linked straights."),
-    "Oschersleben": ("Motorsport Arena Oschersleben", "Oschersleben, Germany", "GER", "Compact technical lap with frequent low-speed direction changes."),
+#
+# The dict key is the exported atlas key and MUST match the circuitKey values
+# produced by scripts/build_race_replays.ps1 (see data_pipeline validation
+# test test_circuit_replay_keys_match). Where TUMFTM's own CSV filename
+# differs from that exported key (e.g. Hungaroring ships as Budapest.csv
+# upstream), the 6th tuple element names the actual source file.
+META: dict[str, tuple[str, str, str, str, str | None]] = {
+    "Melbourne": ("Albert Park", "Melbourne, Australia", "AUS", "Lakeside semi-street loop with fast direction changes.", None),
+    "Spa": ("Spa-Francorchamps", "Stavelot, Belgium", "BEL", "Long Ardennes lap, steep Eau Rouge climb and sweeping back half.", None),
+    "Monza": ("Autodromo Nazionale Monza", "Monza, Italy", "ITA", "Long straights, compact chicanes and the Parabolica arc.", None),
+    "Silverstone": ("Silverstone Circuit", "Silverstone, United Kingdom", "GBR", "Angular high-speed outline shaped by Maggotts and Becketts.", None),
+    "Suzuka": ("Suzuka Circuit", "Suzuka, Japan", "JPN", "The unmistakable figure-eight with Esses and Spoon curve.", None),
+    "SaoPaulo": ("Interlagos", "Sao Paulo, Brazil", "BRA", "Compact anti-clockwise loop with a long uphill final sweep.", None),
+    "Sakhir": ("Bahrain International Circuit", "Sakhir, Bahrain", "BHR", "Wide desert layout built around straights and heavy braking zones.", None),
+    "Austin": ("Circuit of the Americas", "Austin, United States", "USA", "Uphill Turn 1, flowing Esses and a long back straight.", None),
+    "Catalunya": ("Circuit de Barcelona-Catalunya", "Montmelo, Spain", "ESP", "Balanced reference lap with a long main straight and broad final sector.", None),
+    "Spielberg": ("Red Bull Ring", "Spielberg, Austria", "AUT", "Short Alpine lap with three straights and a compact downhill return.", None),
+    "Zandvoort": ("Circuit Zandvoort", "Zandvoort, Netherlands", "NED", "Tight coastal ribbon bookended by distinctive banked turns.", None),
+    "Montreal": ("Circuit Gilles Villeneuve", "Montreal, Canada", "CAN", "Stop-start island circuit with long straights and quick chicanes.", None),
+    "MexicoCity": ("Autodromo Hermanos Rodriguez", "Mexico City, Mexico", "MEX", "Long opening straight feeding a technical stadium section.", None),
+    "Hungaroring": ("Hungaroring", "Mogyorod, Hungary", "HUN", "Continuous, tightly linked corners with very little recovery time.", "Budapest"),
+    "Shanghai": ("Shanghai International Circuit", "Shanghai, China", "CHN", "Recognisable opening snail and an extended back straight.", None),
+    "YasMarina": ("Yas Marina Circuit", "Abu Dhabi, United Arab Emirates", "UAE", "Marina-side loop combining long straights with a compact final sector.", None),
+    "Sepang": ("Sepang International Circuit", "Sepang, Malaysia", "MAS", "Broad, flowing layout framed by two parallel long straights.", None),
+    "Hockenheim": ("Hockenheimring", "Hockenheim, Germany", "GER", "Long hairpin run linked to the compact stadium complex.", None),
+    "Nuerburgring": ("Nuerburgring GP-Strecke", "Nurburg, Germany", "GER", "Modern Grand Prix loop with a tight arena opening sector.", None),
+    "Sochi": ("Sochi Autodrom", "Sochi, Russia", "RUS", "Olympic Park street layout defined by its long constant-radius turn.", None),
+    "BrandsHatch": ("Brands Hatch", "West Kingsdown, United Kingdom", "GBR", "Compact natural-amphitheatre circuit with a plunging opening bend.", None),
+    "IMS": ("Indianapolis Road Course", "Indianapolis, United States", "USA", "Infield road course enclosed by the Speedway's rectangular oval.", None),
+    "MoscowRaceway": ("Moscow Raceway", "Volokolamsk, Russia", "RUS", "Technical modern circuit with a dense, folded infield.", None),
+    "Norisring": ("Norisring", "Nuremberg, Germany", "GER", "Very short street circuit formed by two hairpins and linked straights.", None),
+    "Oschersleben": ("Motorsport Arena Oschersleben", "Oschersleben, Germany", "GER", "Compact technical lap with frequent low-speed direction changes.", None),
 }
 
 
@@ -94,8 +100,8 @@ def length_km(points: list[tuple[float, float]]) -> float:
 def build(source: Path) -> list[dict[str, object]]:
     tracks_dir = source / "tracks"
     atlas = []
-    for key, (name, location, code, description) in META.items():
-        path = tracks_dir / f"{key}.csv"
+    for key, (name, location, code, description, source_key) in META.items():
+        path = tracks_dir / f"{source_key or key}.csv"
         if not path.exists():
             raise FileNotFoundError(path)
         raw_points = read_points(path)

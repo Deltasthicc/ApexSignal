@@ -27,15 +27,16 @@ fixtures; none of them should require a running FastAPI server.
 
 ---
 
-## Telemetry window shape — PROPOSED, needs Workstream A sign-off
+## Telemetry window shape — implemented and in use
 
-> **Status: proposed by Workstream C, not yet agreed.**
-> `data_pipeline/README.md` promises "per-incident Parquet telemetry
-> windows" but never specifies columns, units, or how many laps a window
-> covers. Workstream C needed a concrete shape to build against, so this
-> is it. **Workstream A must either match this or tell Workstream C what
-> to change.** It is not in `contracts/` because it is not agreed yet;
-> once it is, it belongs there.
+> **Status: finalized.** This started as a shape Workstream C needed to
+> build against before `data_pipeline/README.md`'s "per-incident Parquet
+> telemetry windows" had concrete columns. It is now the frozen contract
+> at `contracts/telemetry_window.md`, and `data_pipeline/scripts/
+> build_telemetry_windows.py` / `validate_telemetry_windows.py` both
+> build and enforce it. The summary below is kept for this module's
+> consumer-side context; `contracts/telemetry_window.md` is the source
+> of truth if the two ever drift.
 
 One Parquet file per incident, at the `telemetry_window_path` given in
 `data/incident_manifest.json` (e.g. `data/telemetry/INC-017.parquet`).

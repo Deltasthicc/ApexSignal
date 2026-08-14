@@ -1,9 +1,12 @@
 # Telemetry window contract
 
-**Status: proposed by Workstream A, needs Workstream C sign-off.**
-`api_contract.md` names `telemetry_window_path` but never said what is
-inside the file. This document fills that gap. Nothing here changes an
-existing frozen shape.
+**Status: implemented and in use.** `api_contract.md` names
+`telemetry_window_path` but never said what is inside the file; this
+document fills that gap. Workstream A's `data_pipeline/scripts/
+build_telemetry_windows.py` and `validate_telemetry_windows.py` both
+build and enforce this exact shape, and `services/evidence_memory`
+consumes it — see that service's README for the consumer-side view of
+the same contract. Nothing here changes an existing frozen shape.
 
 Produced by `data_pipeline/scripts/build_telemetry_windows.py`. Consumed by
 `services/core_api` (baseline evidence, lead time) and

@@ -4,6 +4,15 @@ This file exists so a fresh Claude Code session on the GPU box can pick
 up exactly where the previous session left off, without re-deriving
 context from scratch. Read this whole file before doing anything.
 
+> **This is the Day-1 handoff, kept as history.** Everything under "The
+> plan, in order" below has since happened: the 20 clips were labeled,
+> `benchmark_day1.py` ran, Gates 1-6 have real numbers in
+> `VALIDATION_GATES.md`, and a Gate 7 holdout ran (`HOLDOUT_REPORT.md`)
+> though it needs a re-run on the final classifier threshold before it
+> counts as done -- see the Gate 7 section of `VALIDATION_GATES.md` for
+> the current, accurate status. Treat this document as the record of how
+> Day 1 went, not as today's task list.
+
 ---
 
 ## Read this first: this is not your machine

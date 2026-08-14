@@ -313,11 +313,13 @@ stored fields. `storage/schema.sql` has no columns for them and C did
 not redesign the frozen schema. Retrieval uses transcript embedding,
 category, segment, telemetry fingerprint, and lap context.
 
-### `/v1/replay/frame` → not implemented
+### `/v1/replay/frame` → implemented
 
-Listed in `api_contract.md` and charter §11 but not in the §5.1
-must-ship list, and not required by C's independent test. **Workstream D
-should confirm whether they need it**; it is a small addition.
+Listed in `api_contract.md` and charter §11, not in the §5.1 must-ship
+list, and not required by C's independent test, but Workstream D needed
+it: both `services/core_api/app/main.py` and `mock_server/server.py`
+now serve it. This note previously said "not implemented"; it was
+stale as of the presentation-readiness pass.
 
 ---
 
