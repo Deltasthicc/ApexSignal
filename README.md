@@ -21,6 +21,8 @@ Built for **AI Race Month — GrandPrix Hackathon @ Paytm**, anchored on **Probl
 
 - **Presentation site:** https://apex-signal-sigma.vercel.app
 - **Replay API:** https://apexsignal-mock-server.onrender.com/health
+- **Hugging Face Space:** https://huggingface.co/spaces/Deltasthic/ApexSignal
+  (static build, embedded fixture data, no live backend call)
 - **Source:** https://github.com/Deltasthicc/ApexSignal
 
 The public site calls the deployed replay API and automatically falls back to

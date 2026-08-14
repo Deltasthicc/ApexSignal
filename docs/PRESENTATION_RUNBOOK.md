@@ -5,6 +5,7 @@
 1. Public site: https://apex-signal-sigma.vercel.app
 2. API health: https://apexsignal-mock-server.onrender.com/health
 3. GitHub: https://github.com/Deltasthicc/ApexSignal
+4. Hugging Face Space (offline-safe backup, static/embedded, no Render dependency): https://huggingface.co/spaces/Deltasthic/ApexSignal
 
 The web app has an embedded copy of the same replay records, so the judge flow
 continues even while Render's free service wakes. The status chip says
