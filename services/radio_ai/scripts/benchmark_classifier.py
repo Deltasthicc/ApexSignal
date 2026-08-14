@@ -198,7 +198,14 @@ def main(worksheet_path: str) -> None:
         f"base best macro-F1={base_f1:.3f}, xsmall best macro-F1={xsmall_f1:.3f}, "
         f"diff={diff_pp:.1f}pp (each at its own best threshold from the sweep above)"
     )
-    if diff_pp <= 3.0:
+    if diff_pp < -3.0:
+        print(
+            "xsmall beats base by more than 3pp outright -- switch unconditionally "
+            "(USE_CLASSIFIER_FALLBACK=true), the CPU-only tiebreaker doesn't apply "
+            "when one model is just better. This is what happened on 2026-08-14: "
+            "see VALIDATION_GATES.md gate 6c."
+        )
+    elif diff_pp <= 3.0:
         print(
             "xsmall is within 3pp of base. Per VALIDATION_GATES.md gate 6c: "
             "switch to xsmall (USE_CLASSIFIER_FALLBACK=true) ONLY if the service "

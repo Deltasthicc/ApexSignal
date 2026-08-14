@@ -61,8 +61,16 @@ class ModelConfig:
     CLASSIFIER_FALLBACK_MODEL_REVISION = os.environ.get(
         "CLASSIFIER_FALLBACK_MODEL_REVISION", "262ae02f29173eec1c250f90804dc7edc677dcff"
     )
+    # Switched to xsmall on 2026-08-14 after the classify() key-mismatch
+    # fix and Gate 6 re-run: xsmall's corrected macro-F1 (0.393) beats
+    # base's (0.258) by 13.5pp, wins on NO_COMPLAINT (the most common
+    # real-world class) and FRONT_TURNIN_BRAKE, loses only on
+    # MECHANICAL_OTHER. Neither model handles EXIT_TRACTION_REAR at all
+    # (0.000 both), so this costs nothing on the curated demo's own
+    # category. See VALIDATION_GATES.md gate 6c for the full breakdown
+    # and human sign-off record.
     USE_CLASSIFIER_FALLBACK = (
-        os.environ.get("USE_CLASSIFIER_FALLBACK", "false").lower() == "true"
+        os.environ.get("USE_CLASSIFIER_FALLBACK", "true").lower() == "true"
     )
 
     # --- Development corpus ------------------------------------------
@@ -173,10 +181,10 @@ class ClassifierConfig:
     # was measured against a benchmark_classifier.py that didn't match
     # this module's actual candidate-label construction (bare taxonomy
     # keys vs. the real descriptive hypotheses complaint_classifier.py
-    # uses) -- fixed 2026-08-14, re-swept, 0.45 is the genuine best point
-    # under the corrected methodology (macro-F1 0.258). n=58, one dataset
-    # -- revisit as more labeled transcripts accumulate. Also worth
-    # knowing: this same re-sweep found deberta-v3-xsmall now outperforms
-    # this model (macro-F1 0.393 @ threshold 0.15) -- see gate 6c, not
-    # acted on without a human decision.
-    NULL_THRESHOLD = float(os.environ.get("CLASSIFIER_NULL_THRESHOLD", "0.45"))
+    # uses) -- fixed 2026-08-14, re-swept. 0.45 was base's genuine best
+    # point (macro-F1 0.258); 0.15 is xsmall's (macro-F1 0.393), and
+    # USE_CLASSIFIER_FALLBACK above now defaults to xsmall as of the
+    # 2026-08-14 gate 6c human sign-off -- this threshold must move with
+    # it. n=58, one dataset -- revisit as more labeled transcripts
+    # accumulate.
+    NULL_THRESHOLD = float(os.environ.get("CLASSIFIER_NULL_THRESHOLD", "0.15"))
