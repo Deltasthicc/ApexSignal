@@ -68,11 +68,15 @@ really produce.
       (`workflow_dispatch`) — use manual triggering to get a green run
       before judges look at the Actions tab, and don't claim automatic
       CI-on-push is fully working until this is actually root-caused
-- [ ] Reference audio clip is synthesized (TTS), not a real broadcast
-      recording — labeled honestly in the UI and `THIRD_PARTY_NOTICES.md`,
-      not something to walk back to an "authentic" framing without an
-      actually-cleared source (see the audio-rights research prompt if
-      one was run)
+- [x] Reference audio clip is synthesized (TTS), not a real broadcast
+      recording — labeled honestly in the UI and `THIRD_PARTY_NOTICES.md`.
+      **Closed, not just a placeholder decision:** two independent legal
+      research passes (2026-08-15) both concluded no real F1 team radio
+      clip clears a defensible bar for public redistribution — F1's own
+      guidelines prohibit it, no team or dataset has a real reuse license,
+      and Indian fair dealing doesn't survive public web deployment. Keep
+      the synthesized clip; don't revisit this without an actual written
+      license from Formula One Management for a specific recording.
 
 ## Final pass before submitting
 
