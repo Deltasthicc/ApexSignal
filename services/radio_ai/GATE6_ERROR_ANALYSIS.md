@@ -227,3 +227,160 @@ worth trying: per-category label descriptions tuned individually, a
 fixed (less overconfident) stage-1 binary gate, or more labeled data --
 n=58 with 44/58 being one class is a thin basis for any of these
 changes to generalize confidently either way.
+
+## 2026-08-14, continued: three more attempts against xsmall (the real production baseline, 0.393)
+
+Everything above compared against `base`. Production is `xsmall` now
+(see `app/config.py`, `USE_CLASSIFIER_FALLBACK=true`) with corrected
+single-pass macro-F1 **0.393** -- that's the actual number the three
+attempts below are measured against, per `VALIDATION_GATES.md` gate 6
+"things worth trying," roughly in the given order of expected value.
+
+### Attempt 1 (re-tried): fix hierarchical-gate stage 1 -- REJECTED
+
+`scripts/experiment_hierarchical_gate_v2.py`. Stage 1's own error
+analysis said it's overconfident on informational lines mentioning
+mechanical vocabulary without complaining -- tried 4 stage-1 hypothesis
+phrasings (original, "reporting vs relaying," "problem vs mention,"
+"complaint vs observation") × a swept decision threshold (0.3-0.9,
+28 combinations total) against `xsmall`, with stage 2's raw scores
+cached once and reused across every combination.
+
+**Best combination: `"complaint_vs_observation"` @ threshold 0.8,
+macro-F1=0.281 -- a real -11.2pp regression vs. the 0.393 baseline.**
+No phrasing/threshold combination beat single-pass. Per-class F1 at
+best: MECHANICAL_OTHER 0.333, FRONT_TURNIN_BRAKE 0.500, EXIT_TRACTION_REAR
+0.000, TYRE_GRIP_DEGRADATION 0.000, VISIBILITY_TRACK_CONDITION 0.000,
+NO_COMPLAINT 0.854. This confirms (more thoroughly than the first
+hierarchical attempt, which only tried one phrasing at a fixed 0.5
+threshold and landed as "unresolved") that the architecture itself is
+the problem, not the wording: splitting the decision removes
+NO_COMPLAINT's ability to compete as an independent score against each
+real category simultaneously, which is specifically what lets it win
+on informational lines under the single-pass `multi_label=True` setup.
+**Verdict updated from "unresolved" to rejected, for xsmall
+specifically.**
+
+### Attempt 2: per-category taxonomy descriptions, tuned individually -- REJECTED, worse than attempt 1
+
+`scripts/experiment_refined_taxonomy.py`. Kept the winning single-pass
+architecture, rewrote each category's `TAXONOMY` description to target
+its own known failure: MECHANICAL_OTHER made to explicitly exclude
+denied/hypothetical/third-party mentions; FRONT_TURNIN_BRAKE,
+EXIT_TRACTION_REAR, TYRE_GRIP_DEGRADATION each given "even in a calm or
+matter-of-fact tone" framing to catch muted complaints; NO_COMPLAINT
+broadened to explicitly cover third-party/resolved/hypothetical
+mentions. Full sweep re-run for both current and refined wording in
+the same process for a fair same-run comparison.
+
+**Result: macro-F1=0.167 at best threshold (0.6) -- a -22.6pp
+regression, worse than doing nothing and worse than attempt 1.**
+FRONT_TURNIN_BRAKE became a major new false-positive source on
+celebratory/congratulatory messages with zero connection to
+braking/turn-in -- e.g. `"Get in there, Lewis! What a way to win your
+seventh..."` and `"Podium in Qatar! What the hell?... Great job"` both
+misclassified as FRONT_TURNIN_BRAKE. Likely cause: adding "even in a
+calm or matter-of-fact tone" to three category descriptions injected
+generic conversational-tone semantic content that diluted entailment
+specificity rather than sharpening it -- the fix for pattern 2 (muted
+framing) actively broke pattern 1 (context-blindness) worse than
+before, the opposite of the intent. **Rejected, and a specific lesson
+for later: don't add tone/register descriptors to a zero-shot
+hypothesis meant to discriminate on content.**
+
+### Attempt 3 (skipped): more labeled data
+
+Not attempted in this session -- requires human listening/reading to
+produce new ground truth, which this project's standing rule (and this
+gate's own guardrails) explicitly reserve for a human, not an AI
+session. Genuinely skipped, not silently done and hidden.
+
+### Attempt 4: a different model family (sentence embeddings + prototype similarity) -- REAL IMPROVEMENT, not yet adopted
+
+`scripts/experiment_embedding_classifier.py`. Attempts 1-2 plateaued
+(both rejected, both worse than baseline), which is exactly the
+condition the gate's own guardrails set for trying a genuinely
+different architecture rather than another zero-shot-NLI variant.
+
+Model: `sentence-transformers/all-MiniLM-L6-v2`, verified against the
+live HF Hub API before use (same bar every other model in this project
+was held to): exists, ungated, Apache-2.0, sha
+`1110a243fdf4706b3f48f1d95db1a4f5529b4d41`. Each category's existing
+`TAXONOMY` description text becomes its prototype embedding (same text
+the NLI approach already uses, so this isn't confounded by different
+wording) -- cosine similarity between each transcript and all 6
+prototypes, NO_COMPLAINT decided by a swept similarity margin against
+the best real-category match.
+
+**Result: macro-F1=0.454 at margin=0.16 -- a real +6.1pp improvement
+over the 0.393 baseline.** Per-class: MECHANICAL_OTHER 0.286,
+FRONT_TURNIN_BRAKE 0.333, **EXIT_TRACTION_REAR 0.571** (0.000 in every
+NLI attempt so far, including base and xsmall single-pass),
+TYRE_GRIP_DEGRADATION 0.000 (still zero true examples in this sample,
+undefined not failing), VISIBILITY_TRACK_CONDITION 0.727, NO_COMPLAINT
+0.805.
+
+Full margin sweep (0.00-0.30, step 0.02):
+```
+margin     macro-F1   accuracy
+0.0        0.304      32.8%
+0.02       0.315      34.5%
+0.04       0.328      36.2%
+0.06       0.357      44.8%
+0.08       0.393      51.7%
+0.1        0.421      56.9%
+0.12       0.434      62.1%
+0.14       0.446      65.5%
+0.16       0.454      70.7%   <- best
+0.18       0.384      69.0%
+0.2        0.400      72.4%
+0.22       0.367      77.6%
+0.24       0.387      82.8%
+0.26       0.341      81.0%
+0.28       0.359      82.8%
+0.3        0.359      82.8%
+```
+17 mistakes at margin=0.16:
+```
+[NO_COMPLAINT -> VISIBILITY_TRACK_CONDITION] 'So, stop. There is actually a small chance of rain in the race. Meteor France pu'
+[MECHANICAL_OTHER -> FRONT_TURNIN_BRAKE] 'Engine feels poor on downshifts, pushing me forward.'
+[NO_COMPLAINT -> MECHANICAL_OTHER] 'Sebastian, we need to retire the car in the garage. So, box box, the gearbox is '
+[EXIT_TRACTION_REAR -> NO_COMPLAINT] 'Okay, Max, can we have a status update please? Yeah, the rear tires are getting '
+[MECHANICAL_OTHER -> NO_COMPLAINT] 'Where are we losing? Why are we so slow? Okay, Pierre, so we did pick up some da'
+[FRONT_TURNIN_BRAKE -> NO_COMPLAINT] 'I have no chance because we dropped the front wing way too much.'
+[NO_COMPLAINT -> TYRE_GRIP_DEGRADATION] 'Alex, do you think tyres are okay to push a little more through 3 and maybe 13?'
+[NO_COMPLAINT -> VISIBILITY_TRACK_CONDITION] 'We are expecting rain total up 50, expected rain total up 50.'
+[NO_COMPLAINT -> FRONT_TURNIN_BRAKE] "They're very good. We'll go through the details once you're out of the car, but "
+[NO_COMPLAINT -> EXIT_TRACTION_REAR] 'So that floor damage looks like it picked up at turn 8, so right hand side.'
+[EXIT_TRACTION_REAR -> NO_COMPLAINT] 'Is the wind changing between 6 and 7? I had a bit of rear instability. Confirm. '
+[NO_COMPLAINT -> VISIBILITY_TRACK_CONDITION] 'Threat of rain five to ten minutes hitting ten five seven.'
+[NO_COMPLAINT -> TYRE_GRIP_DEGRADATION] 'Albums can be held up by Gasly on Old Tires, Daniel Lastlap, 49.6.'
+[MECHANICAL_OTHER -> NO_COMPLAINT] 'I think I have still some damage. Balance is quite a bit off. Understood. We do '
+[NO_COMPLAINT -> MECHANICAL_OTHER] 'and check the rear brakes, rear brake temperatures during these laps behind the '
+[NO_COMPLAINT -> FRONT_TURNIN_BRAKE] 'Are you locked up and then just turn in very sharp?'
+[NO_COMPLAINT -> TYRE_GRIP_DEGRADATION] "Yeah, that's the last few left. I had to go flat out. It was just really strange"
+```
+
+**Not adopted in production, deliberately, per this gate's own
+guardrail ("flag it back, don't auto-correct").** Reasons to be
+cautious about this specific number, not just excited about it:
+- The margin sweep is noisy, not smooth (0.16 -> 0.454, 0.18 -> 0.384,
+  partial recovery after) -- consistent with n=58 being thin enough
+  that a single flipped example moves the curve visibly. Same
+  overfitting exposure as every other Gate 6 sweep in this project
+  (tuned and measured on the same 58 examples), not a new flaw unique
+  to this approach, but worth naming since the improvement itself is
+  the headline here.
+- Adopting this for real means: adding `sentence-transformers` to
+  `requirements.txt` (currently installed in this venv only, not
+  committed), and rewriting `app/complaint_classifier.py`'s actual
+  decision logic to a different architecture, not a config value --
+  a bigger change than any prior Gate 6 fix.
+- Even at 0.454, this is nowhere close to gate 6a's 0.80 target. Real,
+  worth knowing about, not a fix for the underlying gap.
+
+If this gets pursued further: try richer prototypes (a few real
+example utterances per category averaged together, not just the
+taxonomy description text alone) before concluding embeddings are the
+answer -- this run used the cheapest possible version of the idea and
+still beat the NLI baseline, which is itself informative.

@@ -105,8 +105,8 @@ variant.
 
 | Gate | Threshold | Result | Verdict |
 |---|---|---|---|
-| 6a. Macro-F1, base model | ≥ 0.80 | 0.258 at the best threshold found (0.45). Far below the 0.80 bar. | **FAIL** |
-| 6b. NO_COMPLAINT F1, base model | ≥ 0.85 | 0.737 at threshold 0.45. | **FAIL** |
+| 6a. Macro-F1 | ≥ 0.80 | Production model is now `xsmall` (see 6c): **0.393** at threshold 0.15. (`base`, no longer deployed: 0.258 at threshold 0.45.) Both far below the 0.80 bar. | **FAIL** |
+| 6b. NO_COMPLAINT F1 | ≥ 0.85 | `xsmall`: **0.780** at threshold 0.15. (`base`: 0.737 at threshold 0.45.) | **FAIL** |
 | 6c. xsmall within 3pp of base AND service is CPU-only | Switch to xsmall via `USE_CLASSIFIER_FALLBACK=true` | base best macro-F1 0.258 (threshold 0.45) vs. xsmall best 0.393 (threshold 0.15) — xsmall outperforms base by 13.5pp, not just "within 3pp," so the original CPU-only tiebreaker condition doesn't even apply. | **DECIDED 2026-08-14 — switched to xsmall** |
 
 **2026-08-14 correction, found while re-running Gate 7: everything above this line was originally measured against a broken setup, and has now been re-measured for real.** `app/complaint_classifier.py::classify()` had a key-mismatch bug — it fed the model the taxonomy's long descriptive text as candidate labels (correct, matches this project's stated design), but then looked up scores in the result dict using the *short* taxonomy keys (`"MECHANICAL_OTHER"`, `"NO_COMPLAINT"`, etc.), which never matched anything in that dict. Every lookup silently fell back to `0.0`, so `classify()` returned `(None, None)` for **every input, at every threshold, unconditionally** — the 0.5→0.15 recalibration from the first Gate 6 pass had zero effect on production behavior. Proven directly: a clip with real Whisper-transcribed content ("...The rear end is damaged...") scored 0.988 on the model's own `MECHANICAL_OTHER`-equivalent hypothesis, yet `classify()` still returned `None`. This explains why `complaint_category` was `None` on literally every clip processed all session (`day1_benchmark_report.json`, `data/radio_analysis/*.json`, both prior `HOLDOUT_REPORT.md` versions) — not a calibration or model-quality issue, a distinct code bug. Fixed by mapping the returned hypothesis text back to its short key before doing threshold comparisons.
@@ -123,6 +123,19 @@ Separately, `scripts/benchmark_classifier.py` (everything Gate 6's original numb
 2. **False negatives, muted framing**: matter-of-fact complaints (*"the rear tyres are getting really hot, that's my main problem"*) still get missed as `NO_COMPLAINT` in some cases, hit in others — inconsistent, not resolved.
 
 Full corrected sweep tables, mistake lists, and both re-run experiments: `GATE6_ERROR_ANALYSIS.md`. Short version: the stricter-hypothesis-template idea is still rejected under the corrected methodology (macro-F1 0.161 vs. 0.258 baseline, a real -9.7pp regression, same verdict as before just different magnitude). The hierarchical-gate idea's verdict actually **changes**: under the corrected baseline it scores 0.259 vs. baseline's 0.258 — statistically a tie, not the clear -11.4pp regression measured before. Not a win either. Treat it as unresolved, not rejected.
+
+### 2026-08-14, continued: closing the loop on "things worth trying," against the real xsmall baseline (0.393)
+
+Target for this round: beat xsmall's real 0.393 (base's 0.258 is no longer the relevant number to beat, since it's not deployed). **Result: one real improvement found, not yet adopted; two ideas tried and rejected with more rigor than before.** Full sweep tables and mistake lists for all three: `GATE6_ERROR_ANALYSIS.md`.
+
+1. **Hierarchical gate, re-tried with 4 stage-1 phrasings × 7 thresholds (28 combinations) against xsmall**: best combination macro-F1=0.281, a real -11.2pp regression. No combination beat single-pass. **Verdict firms up from "unresolved" to rejected** — the architecture itself loses, not just the wording.
+2. **Per-category taxonomy descriptions, tuned individually**: macro-F1=0.167 at best threshold — a **-22.6pp regression**, worse than attempt 1. Adding "even in a calm tone" to three category descriptions backfired badly (celebratory messages like *"Get in there, Lewis! What a way to win..."* got flagged `FRONT_TURNIN_BRAKE`) — diluted entailment specificity instead of sharpening it. **Rejected.**
+3. **More labeled data**: not attempted — needs human listening/reading for new ground truth, which is explicitly reserved for a human by this project's own standing rule. Genuinely skipped, not done and hidden.
+4. **A different model family — sentence embeddings + prototype similarity, `sentence-transformers/all-MiniLM-L6-v2`** (verified against the live HF API first: exists, ungated, Apache-2.0, sha `1110a243fdf4706b3f48f1d95db1a4f5529b4d41`, same bar every other model here was held to). Category `TAXONOMY` text reused as prototypes, no new wording. **Result: macro-F1=0.454 at margin=0.16 — a real +6.1pp improvement.** `EXIT_TRACTION_REAR` jumps to F1=0.571 (was 0.000 in every NLI attempt, base and xsmall both).
+
+**Not adopted in production.** Real reasons for caution, not just formality: the margin sweep is noisy (0.16→0.454, 0.18→0.384, partial recovery after — n=58 is thin enough for one flipped example to move the curve visibly, same exposure every Gate 6 number here has). Adopting it for real means a new dependency (`sentence-transformers`, currently installed in this venv only, not in `requirements.txt`) and rewriting `app/complaint_classifier.py`'s actual decision logic, not a config value — a bigger change than any prior Gate 6 fix, and still nowhere near the 0.80 target even if adopted. Flagging this back for a decision rather than switching it in, per this gate's own rule.
+
+**Honest bottom line for this session's Gate 6 push**: went from a completely broken classifier (bug: always `None`) to a real, measured 0.393 baseline, to a real, measured 0.454 candidate — genuine progress, not a closed gate. 0.80 is not reachable with what's been tried so far; that's a legitimate outcome to report, not a gap to paper over.
 
 ## Gate 7 — Day 5 holdout
 
