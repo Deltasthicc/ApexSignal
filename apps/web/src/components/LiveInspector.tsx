@@ -94,6 +94,7 @@ export function LiveInspector({
                   &#9679; {statusText}
                 </span>
                 <button
+                  type="button"
                   onClick={onTogglePitWall}
                   className={`border px-3 py-1 transition ${
                     pitWallMode
@@ -154,6 +155,7 @@ export function LiveInspector({
                         {entries.map((entry) => (
                           <li key={entry.incident_id}>
                             <button
+                              type="button"
                               onClick={() => onSelect(entry.incident_id)}
                               className={`w-full border px-3 py-2 text-left text-xs transition ${
                                 entry.incident_id === selectedId

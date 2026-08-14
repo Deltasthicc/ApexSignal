@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   analyzeRadio,
   checkHealth,
@@ -71,16 +71,18 @@ export default function PitWallPage() {
 
   // Prefetch radio + assessment for every entry so the grid/timeline can
   // color pins by tone and the evidence sections resolve immediately.
+  const prefetchStarted = useRef(new Set<string>());
   useEffect(() => {
     if (!Array.isArray(entries)) return;
     for (const entry of entries) {
       const id = entry.incident_id;
-      setRadioCache((prev) => (prev[id] ? prev : { ...prev, [id]: "loading" }));
+      if (prefetchStarted.current.has(id)) continue;
+      prefetchStarted.current.add(id);
+
       analyzeRadio(id)
         .then((data) => setRadioCache((prev) => ({ ...prev, [id]: data })))
         .catch(() => setRadioCache((prev) => ({ ...prev, [id]: "error" })));
 
-      setAssessmentCache((prev) => (prev[id] ? prev : { ...prev, [id]: "loading" }));
       fetchIncidentAssessment(id)
         .then((data) => setAssessmentCache((prev) => ({ ...prev, [id]: data })))
         .catch(() => setAssessmentCache((prev) => ({ ...prev, [id]: "error" })));
@@ -111,46 +113,48 @@ export default function PitWallPage() {
       <TopBar />
       <RaceReplayBackground />
 
-      <Hero
-        sessionId={Array.isArray(entries) && entries[0] ? entries[0].session_id : "—"}
-        driver={Array.isArray(entries) && entries[0] ? entries[0].driver : "—"}
-        incidentCount={Array.isArray(entries) ? entries.length : null}
-        modeLabel={presentationMode(health)}
-      />
+      <div className="relative z-10">
+        <Hero
+          sessionId={Array.isArray(entries) && entries[0] ? entries[0].session_id : "—"}
+          driver={Array.isArray(entries) && entries[0] ? entries[0].driver : "—"}
+          incidentCount={Array.isArray(entries) ? entries.length : null}
+          modeLabel={presentationMode(health)}
+        />
 
-      <PipelineSection />
+        <PipelineSection />
 
-      <CircuitAtlasSection />
+        <CircuitAtlasSection />
 
-      {Array.isArray(entries) && entries.length > 0 && (
-        <SessionGrid
+        {Array.isArray(entries) && entries.length > 0 && (
+          <SessionGrid
+            entries={entries}
+            radioCache={radioCache}
+            assessmentCache={assessmentCache}
+            onSelect={selectAndScrollToLive}
+          />
+        )}
+
+        <LiveInspector
+          health={health}
           entries={entries}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          pitWallMode={pitWallMode}
+          onTogglePitWall={() => setPitWallMode((v) => !v)}
           radioCache={radioCache}
           assessmentCache={assessmentCache}
-          onSelect={selectAndScrollToLive}
+          toneByIncident={toneByIncident}
+          totalLaps={totalLaps}
         />
-      )}
 
-      <LiveInspector
-        health={health}
-        entries={entries}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-        pitWallMode={pitWallMode}
-        onTogglePitWall={() => setPitWallMode((v) => !v)}
-        radioCache={radioCache}
-        assessmentCache={assessmentCache}
-        toneByIncident={toneByIncident}
-        totalLaps={totalLaps}
-      />
+        {Array.isArray(entries) && entries.length > 0 && (
+          <EvidenceStory entries={entries} assessmentCache={assessmentCache} />
+        )}
 
-      {Array.isArray(entries) && entries.length > 0 && (
-        <EvidenceStory entries={entries} assessmentCache={assessmentCache} />
-      )}
-
-      <ScopeSection />
-      <MaterialsSection />
-      <TeamSection />
+        <ScopeSection />
+        <MaterialsSection />
+        <TeamSection />
+      </div>
     </main>
   );
 }

@@ -21,9 +21,10 @@ export function AudioPlayer({
         aria-label={`Play ${clipLabel}`}
       />
       <p className="mt-2 text-[9px] leading-relaxed text-dim">
-        Team-provided original recording. No synthesized voice. This reference
-        clip demonstrates the audio input; it is not presented as the recording
-        for this contract replay incident.
+        Reference team-radio audio, no synthesized voice. This clip
+        demonstrates the audio input; it is not presented as the recording
+        for this contract replay incident. See THIRD_PARTY_NOTICES.md for
+        its sourcing.
       </p>
     </div>
   );

@@ -31,7 +31,7 @@ export function Hero({
   return (
     <section
       id="hero"
-      className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-bg px-6 pb-16 pt-28"
+      className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-bg/80 px-6 pb-16 pt-28"
       style={{
         backgroundImage:
           "radial-gradient(circle at 1px 1px, rgba(240,240,240,0.06) 1px, transparent 0)",
@@ -99,6 +99,7 @@ export function Hero({
             <Corner className="bottom-0 right-0 border-b border-r" />
 
             <button
+              type="button"
               onClick={toggleClip}
               className={`absolute right-4 top-4 z-10 flex items-center gap-1.5 border px-2.5 py-1 text-[9px] uppercase tracking-[0.14em] transition ${
                 playing
@@ -125,7 +126,7 @@ export function Hero({
                 <Legend color="bg-gold" label="Deviation confirmed" />
               </div>
               <span className={playing ? "text-red" : ""}>
-                {playing ? "now playing…" : "team-provided race-radio reference"}
+                {playing ? "now playing…" : "reference race-radio clip"}
               </span>
             </div>
           </div>

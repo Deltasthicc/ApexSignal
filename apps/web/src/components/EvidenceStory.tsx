@@ -64,7 +64,7 @@ export function EvidenceStory({
                     After &middot; ApexSignal
                   </p>
                   <p className="tabular text-sm text-ink">
-                    L{goldAfter.lap} &mdash; same complaint, confirmed by telemetry
+                    L{goldAfter.lap} &mdash; same complaint, telemetry consistent
                   </p>
                   <p className="mt-1 text-[11.5px] text-dim">
                     Baseline: <span className="text-ink">{goldAfterAssessment.baseline_evidence.status.replace(/_/g, " ")}</span>

@@ -101,7 +101,7 @@ function RaceLayer({ replay, elapsedMs }: { replay: RaceReplay; elapsedMs: numbe
   const path = useMemo(() => circuitPath(circuit, 1000, 700, 70), [circuit]);
 
   return (
-    <div className="race-replay-layer absolute inset-0 grid grid-cols-[minmax(0,1fr)_196px] gap-3 px-4 pb-6 pt-20 sm:grid-cols-[minmax(0,1fr)_220px] sm:px-7">
+    <div className="race-replay-layer absolute inset-0 grid grid-cols-1 gap-3 px-4 pb-6 pt-20 sm:grid-cols-[minmax(0,1fr)_220px] sm:px-7">
       <div className="relative min-w-0">
         <svg viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" className="h-full w-full">
           <path d={path} fill="none" stroke="#f0f0f0" strokeOpacity="0.15" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
@@ -130,20 +130,20 @@ function RaceLayer({ replay, elapsedMs }: { replay: RaceReplay; elapsedMs: numbe
             );
           })}
         </svg>
-        <div className="absolute left-1 top-1 border-l border-red/70 pl-3 uppercase">
+        <div className="absolute left-1 top-1 hidden border-l border-red/70 pl-3 uppercase sm:block">
           <p className="text-[8px] tracking-[0.22em] text-red">Historical race replay · {replay.season}</p>
           <p className="mt-1 text-[13px] tracking-[0.08em] text-ink">{circuit.name}</p>
           <p className="mt-1 text-[8px] tracking-[0.1em] text-dim">{circuit.location} · {replay.eventName}</p>
           <p className="mt-2 max-w-sm text-[8px] normal-case leading-relaxed text-dim">{replay.note}</p>
         </div>
-        <div className="absolute bottom-0 left-1 flex items-baseline gap-2 border-l border-red/70 pl-3 uppercase">
+        <div className="absolute bottom-0 left-1 hidden items-baseline gap-2 border-l border-red/70 pl-3 uppercase sm:flex">
           <span className="text-[8px] tracking-[0.18em] text-dim">race lap</span>
           <span className="tabular text-lg text-ink">{Math.min(lap + 1, replay.totalLaps)}</span>
           <span className="text-[9px] text-dim">/ {replay.totalLaps}</span>
         </div>
       </div>
 
-      <aside className="self-start border border-rule/70 bg-bg/45 p-2 backdrop-blur-[2px]">
+      <aside className="hidden self-start border border-rule/70 bg-bg/45 p-2 backdrop-blur-[2px] sm:block">
         <div className="mb-2 flex items-center justify-between border-b border-rule pb-2 text-[7px] uppercase tracking-[0.16em] text-dim">
           <span>Live order</span>
           <span>{replay.drivers.length} entries</span>
@@ -187,13 +187,33 @@ export function RaceReplayBackground() {
     }
     const next = chooseReplay(previous);
     rememberReplay(RACE_REPLAYS[next]);
-    setReplayIndex(next);
-    const frame = requestAnimationFrame(() => setVisible(true));
-    return () => cancelAnimationFrame(frame);
+    // queueMicrotask, not requestAnimationFrame: rAF is suspended for
+    // hidden/non-composited documents (backgrounded tab, occluded window),
+    // which would otherwise leave this background stuck unmounted forever.
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setReplayIndex(next);
+      setVisible(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     if (replayIndex === null) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // Hold on a single static frame instead of driving the per-frame
+      // timer; .race-replay-shell also disables the CSS animations.
+      let cancelled = false;
+      queueMicrotask(() => {
+        if (!cancelled) setElapsedMs(RACE_DURATION_MS / 2);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
     let frame = 0;
     let lastPaintAt = 0;
     let transitionTimer = 0;
@@ -227,13 +247,18 @@ export function RaceReplayBackground() {
 
   useEffect(() => {
     if (replayIndex === null || elapsedMs !== 0) return;
-    const frame = requestAnimationFrame(() => setVisible(true));
-    return () => cancelAnimationFrame(frame);
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) setVisible(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [cycle, elapsedMs, replayIndex]);
 
   if (replayIndex === null) return null;
   return (
-    <div aria-hidden className={`race-replay-shell pointer-events-none fixed inset-0 z-40 overflow-hidden mix-blend-screen ${visible ? "is-visible" : ""}`}>
+    <div aria-hidden className={`race-replay-shell pointer-events-none fixed inset-0 z-0 overflow-hidden mix-blend-screen ${visible ? "is-visible" : ""}`}>
       <RaceLayer replay={RACE_REPLAYS[replayIndex]} elapsedMs={elapsedMs} />
     </div>
   );

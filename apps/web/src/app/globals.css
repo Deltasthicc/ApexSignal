@@ -17,7 +17,7 @@ html {
 body {
   background: #0a0a0a;
   color: #f0f0f0;
-  font-family: "JetBrains Mono", "IBM Plex Mono", Menlo, Consolas, monospace;
+  font-family: var(--font-jetbrains-mono), "IBM Plex Mono", Menlo, Consolas, monospace;
   font-size: 13px;
   letter-spacing: 0.01em;
 }

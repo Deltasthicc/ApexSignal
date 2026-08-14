@@ -78,8 +78,8 @@ export function CircuitSignalGraphic({ playing = false }: { playing?: boolean })
         <circle r="8" fill="none" stroke="#e10600" strokeWidth="1" className="radar-ping" />
         <path d="M 8 -2 L 55 -35" fill="none" stroke="#e10600" strokeWidth="1" strokeDasharray="2 4" />
         <text x="61" y="-39" className="fill-red" style={{ fontSize: "8px", letterSpacing: "0.12em" }}>RADIO · L14</text>
-        <text x="61" y="-25" className="fill-ink" style={{ fontSize: "9px", letterSpacing: "0.1em" }}>EVIDENCE · L17</text>
-        <text x="61" y="-12" className="fill-dim" style={{ fontSize: "8px", letterSpacing: "0.1em" }}>189.4S LEAD TIME</text>
+        <text x="61" y="-25" className="fill-ink" style={{ fontSize: "9px", letterSpacing: "0.1em" }}>RECURS · L17</text>
+        <text x="61" y="-12" className="fill-dim" style={{ fontSize: "8px", letterSpacing: "0.1em" }}>54.6S POST-CALL LEAD TIME</text>
       </g>
 
       <g transform="translate(24 281)">
@@ -109,6 +109,7 @@ export function CircuitSignalGraphic({ playing = false }: { playing?: boolean })
 function CircuitCard({ circuit, selected, onSelect }: { circuit: CircuitShape; selected: boolean; onSelect: () => void }) {
   return (
     <button
+      type="button"
       onClick={onSelect}
       aria-pressed={selected}
       className={`group relative overflow-hidden border bg-bg2 text-left transition duration-300 hover:-translate-y-1 hover:border-red/60 focus:outline-none focus-visible:border-red ${selected ? "border-red/70 shadow-[0_16px_45px_rgba(0,0,0,0.45)]" : "border-rule"}`}

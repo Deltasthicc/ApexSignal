@@ -40,6 +40,7 @@ export function SessionGrid({
             return (
               <Reveal key={entry.incident_id} delayMs={i * 100}>
                 <button
+                  type="button"
                   onClick={() => onSelect(entry.incident_id)}
                   className="w-full border border-rule bg-bg2 p-5 text-left transition hover:border-red/40"
                 >

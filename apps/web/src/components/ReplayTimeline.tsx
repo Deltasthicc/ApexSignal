@@ -67,6 +67,7 @@ export function ReplayTimeline({
             NOW <span className="text-ink">L{Math.min(cursorLap, totalLaps)}</span>
           </span>
           <button
+            type="button"
             onClick={playing ? stop : play}
             className="border border-red/50 px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-red transition hover:bg-red hover:text-ink"
           >
@@ -99,6 +100,7 @@ export function ReplayTimeline({
               : "bg-dim";
           return (
             <button
+              type="button"
               key={entry.incident_id}
               onClick={() => onSelect(entry.incident_id)}
               className="group absolute top-8 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center"
@@ -128,8 +130,8 @@ export function ReplayTimeline({
           <span className="h-1.5 w-1.5 rounded-full bg-teal" /> DRY
         </span>
         <span className="flex items-center gap-1.5 text-[10px] text-dim">
-          <span className="h-1.5 w-1.5 rounded-full bg-dim" /> No incidents flagged
-          outside the marked laps
+          <span className="h-1.5 w-1.5 rounded-full bg-dim" /> This reference replay
+          includes no incidents outside the marked laps
         </span>
       </div>
     </div>
