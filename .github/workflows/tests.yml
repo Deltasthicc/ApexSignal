@@ -28,7 +28,11 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r services/radio_ai/requirements.txt
-      - run: pytest tests
+      # python -m pytest, not bare pytest: -m adds the cwd to sys.path so
+      # `from app...` resolves. A bare `pytest` invocation doesn't add it,
+      # which is exactly why this job failed on every prior CI run while
+      # scripts/run_test_suites.py (which does use -m) passed locally.
+      - run: python -m pytest tests
         working-directory: services/radio_ai
 
   core_api:
@@ -39,7 +43,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r services/core_api/requirements.txt
-      - run: pytest tests
+      - run: python -m pytest tests
         working-directory: services/core_api
 
   web:
