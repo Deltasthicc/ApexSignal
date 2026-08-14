@@ -123,7 +123,7 @@ export function Hero({
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <Legend color="bg-red" label="Radio call" />
                 <Legend color="bg-ink/60" label="Source centerline" />
-                <Legend color="bg-gold" label="Deviation confirmed" />
+                <Legend color="bg-gold" label="Deviation observed" />
               </div>
               <span className={playing ? "text-red" : ""}>
                 {playing ? "now playing…" : "reference race-radio clip"}

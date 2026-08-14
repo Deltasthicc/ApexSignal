@@ -7,11 +7,13 @@ context from scratch. Read this whole file before doing anything.
 > **This is the Day-1 handoff, kept as history.** Everything under "The
 > plan, in order" below has since happened: the 20 clips were labeled,
 > `benchmark_day1.py` ran, Gates 1-6 have real numbers in
-> `VALIDATION_GATES.md`, and a Gate 7 holdout ran (`HOLDOUT_REPORT.md`)
-> though it needs a re-run on the final classifier threshold before it
-> counts as done -- see the Gate 7 section of `VALIDATION_GATES.md` for
-> the current, accurate status. Treat this document as the record of how
-> Day 1 went, not as today's task list.
+> `VALIDATION_GATES.md`, and a Gate 7 holdout ran and was re-run again
+> after a real classifier bug fix on 2026-08-14 (`classify()` was
+> silently returning `None` for every input regardless of threshold --
+> see Gate 6/7 in `VALIDATION_GATES.md`). Gate 7's backend mechanics are
+> done; classifier quality itself (macro-F1 0.258) is still the open
+> problem, not a re-run. Treat this document as the record of how Day 1
+> went, not as today's task list.
 
 ---
 

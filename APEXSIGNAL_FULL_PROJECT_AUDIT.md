@@ -5,6 +5,14 @@
 **Frontend:** [apex-signal-sigma.vercel.app](https://apex-signal-sigma.vercel.app/)  
 **Replay API:** [apexsignal-mock-server.onrender.com](https://apexsignal-mock-server.onrender.com/health)
 
+> **Status: historical snapshot, not current state.** This is the audit
+> that the same-day presentation-readiness pass (commits `7ec2d04`,
+> `2a19488`, `9977c4a`, and later the classifier fix `de04e55`) was
+> written to fix. Most of Section 2's P0 bugs and Section 12 Phase 1
+> checklist are now resolved in code — see `docs/PROJECT_STATUS.md` and
+> `git log` for current state instead of treating this file as live.
+> Kept as-is (not edited) for its own audit trail integrity.
+
 ## Executive verdict
 
 ApexSignal is currently a strong, working presentation demo, but it is not yet a complete live AI product.

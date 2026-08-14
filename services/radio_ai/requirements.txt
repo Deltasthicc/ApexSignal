@@ -14,6 +14,7 @@ torch>=2.3
 torchaudio>=2.3
 torchcodec>=0.10  # torchaudio.load() delegates to this since torchaudio 2.9+; missing it fails at decode time, not import time
 soundfile>=0.12
+numpy>=1.24  # imported directly in asr.py/audio_preprocessing.py/pipeline.py/tone.py -- pin it, don't rely on a transitive torch/transformers version
 
 # Complaint classifier: DeBERTa v3 zero-shot NLI (sentencepiece tokenizer)
 sentencepiece>=0.2

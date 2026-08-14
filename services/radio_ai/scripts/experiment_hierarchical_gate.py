@@ -89,8 +89,12 @@ def main(worksheet_path: str) -> None:
     for label in LABELS:
         print(f"  {label:<28s} F1={per_class_f1[label]:.3f}")
 
-    print(f"\nBaseline (single-pass multi_label, threshold 0.15) was macro-F1=0.356 -- see GATE6_ERROR_ANALYSIS.md")
-    print(f"Delta: {(macro_f1 - 0.356) * 100:+.1f}pp")
+    # 0.258 is the corrected baseline (single-pass multi_label, threshold
+    # 0.45) after the classify() key-mismatch fix -- see VALIDATION_GATES.md
+    # gate 6. The pre-fix 0.356 was never real; don't reintroduce it here.
+    CORRECTED_BASELINE_MACRO_F1 = 0.258
+    print(f"\nBaseline (single-pass multi_label, threshold 0.45) is macro-F1={CORRECTED_BASELINE_MACRO_F1} -- see GATE6_ERROR_ANALYSIS.md")
+    print(f"Delta: {(macro_f1 - CORRECTED_BASELINE_MACRO_F1) * 100:+.1f}pp")
 
     stage1_wrong = [
         (t, tl, ic, score) for t, tl, ic, score in stage1_calls

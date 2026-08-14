@@ -140,8 +140,11 @@ cd apps/web && npm install && npm run dev
 ```
 
 `services/core_api` runs `EVALUATE_MODE=fixture` by default (162 tests
-pass against it), so this exercises the real evidence-pipeline service
-without needing Workstream A's real telemetry/manifest data.
+pass against it with every dependency in `requirements.txt` installed;
+5 of those require `sentence-transformers` specifically and show as
+skipped, not failed, without it), so this exercises the real
+evidence-pipeline service without needing Workstream A's real
+telemetry/manifest data.
 
 ### Docker Compose
 
