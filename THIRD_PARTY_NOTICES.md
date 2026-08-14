@@ -37,10 +37,42 @@ The team-radio audio clip played from the hero section and incident inspector
 (`apps/web/public/audio/reference-radio-clip.mp3`) is a synthesized voice
 (Microsoft Edge TTS, `en-GB-RyanNeural`) reading the INC-114 fixture's own
 transcript ("Rear is moving on throttle, exiting Turn 7."). It replaced an
-earlier real broadcast excerpt whose redistribution rights were never
-confirmed. Fully original audio generated for this repository -- no
-third-party broadcast rights apply. Labeled as synthesized in the UI
-(`AudioPlayer.tsx`), not presented as an authentic recording.
+earlier real broadcast excerpt. Fully original audio generated for this
+repository -- no third-party broadcast rights apply. Labeled as synthesized
+in the UI (`AudioPlayer.tsx`), not presented as an authentic recording.
+
+**This is a settled decision, not an open question.** Two independent
+research passes (2026-08-15) into whether a genuinely rights-clear real F1
+team radio clip exists for a publicly deployed app both concluded no such
+clip exists:
+
+- Formula 1's own published content guidelines explicitly state audio/audiovisual
+  content "should not be used" beyond platform-native sharing/embedding, and
+  that copying/reproducing F1 audio is not permitted; the educational-use
+  carve-out they describe explicitly excludes "public postings such as
+  YouTube, websites and social media."
+- No F1 team (Mercedes, Red Bull, Ferrari, McLaren, Aston Martin, Alpine)
+  publishes team radio audio under an open reuse license -- all reserve
+  rights or use standard personal/non-commercial terms.
+- `MikCil/f1-team-radio`'s CC-BY-4.0 tag (and similar scraped datasets, e.g.
+  OpenF1-derived corpora) cannot legally cover the underlying broadcast audio:
+  a license can only cover rights the licensor actually holds, and every one
+  of these dataset cards credits Formula 1 as the source of the original
+  broadcasts without documenting any permission from Formula 1 to
+  redistribute it. OpenF1 itself explicitly disclaims ownership of F1
+  broadcasts.
+- Indian fair dealing (Copyright Act 1957, ss. 52/39) does not provide a
+  general "educational/non-commercial" exemption, has no seconds-based safe
+  harbor (`Super Cassettes v. Hamar`, `India TV v. Yashraj Films` both reject
+  short-clip-length alone as a defense), and its private-use/research
+  exceptions do not survive public web deployment -- a publicly reachable
+  Hugging Face Space or website is "communication to the public," which is
+  the copyright owner's exclusive right, not private use.
+
+Given that, keep the synthesized clip. Do not swap in a real F1 broadcast
+excerpt without an explicit written license from Formula One Management for
+that specific recording and specific public use -- "found it online" or "it's
+short" are not defenses under any of the above.
 
 ## Hugging Face dataset (Workstream B development only)
 
