@@ -116,7 +116,7 @@ function RaceLayer({ replay, elapsedMs }: { replay: RaceReplay; elapsedMs: numbe
     <div className="race-replay-layer absolute inset-0 grid grid-cols-1 gap-3 px-4 pb-6 pt-20 sm:grid-cols-[minmax(0,1fr)_220px] sm:px-7">
       <div className="relative min-w-0">
         <svg viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" className="h-full w-full">
-          <path d={path} fill="none" stroke="#f0f0f0" strokeOpacity="0.15" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+          <path d={path} fill="none" stroke="#f0f0f0" strokeOpacity="0.22" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
           <path d={path} fill="none" stroke="#e10600" strokeOpacity="0.2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="7 11" />
           {order.map((driverId, position) => {
             const driver = drivers.get(driverId);
