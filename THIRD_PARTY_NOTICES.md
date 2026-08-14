@@ -33,15 +33,14 @@ ever ships small, per-incident telemetry windows, not bulk session exports.
 
 ## Reference race-radio audio clip
 
-The team-radio audio clip played from the hero section
-(`apps/web/public/audio/lando-norris-fp1-tuscany.mp3`) is a short excerpt used
-as an illustrative reference for what team radio sounds like. **Its
-redistribution rights are not yet documented.** Before treating this build as
-anything beyond an internal/judged hackathon demo, the team must confirm and
-record here: original source, broadcaster, and whatever license or fair-use
-basis permits redistributing it publicly. Until that's resolved, do not
-describe it in any materials as team-owned or as cleared for open
-redistribution.
+The team-radio audio clip played from the hero section and incident inspector
+(`apps/web/public/audio/reference-radio-clip.mp3`) is a synthesized voice
+(Microsoft Edge TTS, `en-GB-RyanNeural`) reading the INC-114 fixture's own
+transcript ("Rear is moving on throttle, exiting Turn 7."). It replaced an
+earlier real broadcast excerpt whose redistribution rights were never
+confirmed. Fully original audio generated for this repository -- no
+third-party broadcast rights apply. Labeled as synthesized in the UI
+(`AudioPlayer.tsx`), not presented as an authentic recording.
 
 ## Hugging Face dataset (Workstream B development only)
 

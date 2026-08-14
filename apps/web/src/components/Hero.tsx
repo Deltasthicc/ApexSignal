@@ -111,7 +111,7 @@ export function Hero({
             </button>
             <audio
               ref={audioRef}
-              src="/audio/lando-norris-fp1-tuscany.mp3"
+              src="/audio/reference-radio-clip.mp3"
               onPlay={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
               onEnded={() => setPlaying(false)}
@@ -126,7 +126,7 @@ export function Hero({
                 <Legend color="bg-gold" label="Deviation observed" />
               </div>
               <span className={playing ? "text-red" : ""}>
-                {playing ? "now playing…" : "reference race-radio clip"}
+                {playing ? "now playing…" : "synthesized reference clip"}
               </span>
             </div>
           </div>

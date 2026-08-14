@@ -19,7 +19,7 @@ type Props = {
 };
 
 export function IncidentPanel({ entry, radio, assessment, pitWallMode }: Props) {
-  const audioSrc = "/audio/lando-norris-fp1-tuscany.mp3";
+  const audioSrc = "/audio/reference-radio-clip.mp3";
 
   if (pitWallMode) {
     return (
@@ -35,7 +35,7 @@ export function IncidentPanel({ entry, radio, assessment, pitWallMode }: Props) 
         <div className="mt-5">
           <AudioPlayer
             src={audioSrc}
-            clipLabel="Lando Norris · Tuscany FP1"
+            clipLabel="Synthesized reference audio"
           />
         </div>
         <p className="mt-6 border-t border-rule pt-4 text-[11px] leading-relaxed text-dim">
@@ -64,7 +64,7 @@ export function IncidentPanel({ entry, radio, assessment, pitWallMode }: Props) 
         <p className="label mb-2">Radio</p>
         <AudioPlayer
           src={audioSrc}
-          clipLabel="Lando Norris · Tuscany FP1"
+          clipLabel="Synthesized reference audio"
         />
         {radio === "loading" && (
           <p className="mt-3 text-xs text-dim">Analyzing transcript&hellip;</p>
