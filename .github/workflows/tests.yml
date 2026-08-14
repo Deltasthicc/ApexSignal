@@ -5,6 +5,7 @@ on:
     branches: [main, integration/main]
   push:
     branches: [main, integration/main]
+  workflow_dispatch: {}
 
 jobs:
   data_pipeline:

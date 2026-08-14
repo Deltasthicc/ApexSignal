@@ -47,7 +47,7 @@ export function GoldIncidentCard({
           <span className="tabular text-red">
             {assessment.driver_warning_lead_time_s.toFixed(1)}s
           </span>
-          {" "}&mdash; before the driver reported it a third time.
+          .
         </p>
       )}
     </div>
