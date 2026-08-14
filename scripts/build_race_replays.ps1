@@ -11,6 +11,14 @@ function Get-JsonWithRetry([string]$Uri) {
   }
 }
 
+function ConvertTo-Seconds([string]$LapTime) {
+  # Ergast/Jolpica lap times are "M:SS.sss" -- the driver's own time to
+  # complete that specific lap, not a gap or time-of-day. Used to build a
+  # real cumulative race clock per driver, not assumed/uniform spacing.
+  $parts = $LapTime -split ':'
+  return ([double]$parts[0] * 60.0) + [double]$parts[1]
+}
+
 function Get-AllLapRows([string]$Base) {
   $rowsByLap = [ordered]@{}
   $offset = 0
@@ -109,14 +117,36 @@ foreach ($raceSpec in $races) {
   $gridOrder = @($drivers | Sort-Object @{ Expression = { if ($_.grid -eq 0) { 999 } else { $_.grid } } } | ForEach-Object { $_.id })
   $orders = [System.Collections.Generic.List[object]]::new()
   $orders.Add(@($gridOrder))
+
+  # Real per-driver cumulative race time, accumulated lap by lap from each
+  # driver's own recorded lap time -- not a stand-in for track position.
+  # gaps[lapIndex] is a lap-time gap-to-leader in SECONDS, parallel to
+  # orders[lapIndex] (same driver, same array position). The frontend
+  # divides by avgLapTimeS to turn that into a fraction of the track loop,
+  # instead of the previous fixed "position * constant" spacing that had
+  # no relationship to how far apart the real cars actually were.
+  $cumulative = @{}
+  foreach ($driver in $drivers) { $cumulative[$driver.id] = 0.0 }
+  $gaps = [System.Collections.Generic.List[object]]::new()
+  $gaps.Add(@($gridOrder | ForEach-Object { 0.0 }))
+
   foreach ($lap in $lapRows) {
-    $orders.Add(@($lap.Timings | Sort-Object { [int]$_.position } | ForEach-Object { [string]$_.driverId }))
+    foreach ($timing in $lap.Timings) {
+      $cumulative[[string]$timing.driverId] += ConvertTo-Seconds ([string]$timing.time)
+    }
+    $orderedIds = @($lap.Timings | Sort-Object { [int]$_.position } | ForEach-Object { [string]$_.driverId })
+    $orders.Add($orderedIds)
+    $leaderTime = $cumulative[$orderedIds[0]]
+    $gaps.Add(@($orderedIds | ForEach-Object { [Math]::Round(($cumulative[$_] - $leaderTime), 3) }))
   }
 
   $raceDistance = [int](($resultRows | Measure-Object -Property laps -Maximum).Maximum)
   if ($orders.Count -ne ($raceDistance + 1)) {
     throw "$($raceSpec.circuitKey) timing coverage is incomplete: expected $raceDistance laps, reconstructed $($orders.Count - 1)."
   }
+
+  $winnerId = $orders[$orders.Count - 1][0]
+  $avgLapTimeS = [Math]::Round($cumulative[$winnerId] / $raceDistance, 3)
 
   $output += [ordered]@{
     circuitKey = $raceSpec.circuitKey
@@ -128,8 +158,10 @@ foreach ($raceSpec in $races) {
     note = $raceSpec.note
     sourceUrl = $base
     articleUrl = [string]$race.url
+    avgLapTimeS = $avgLapTimeS
     drivers = @($drivers)
     orders = @($orders)
+    gaps = @($gaps)
   }
 }
 

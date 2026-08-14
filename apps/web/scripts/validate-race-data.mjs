@@ -59,6 +59,27 @@ for (const replay of replays) {
   if (!Number.isFinite(replay.totalLaps) || replay.totalLaps <= 0) {
     errors.push(`${label}: totalLaps must be a positive number, got ${replay.totalLaps}`);
   }
+
+  // Real gap-to-leader data (see scripts/build_race_replays.ps1): without
+  // it the background silently falls back to fixed uniform spacing, which
+  // is exactly the "every car equidistant" bug this field exists to fix.
+  if (!Number.isFinite(replay.avgLapTimeS) || replay.avgLapTimeS <= 0) {
+    errors.push(`${label}: avgLapTimeS must be a positive number, got ${replay.avgLapTimeS}`);
+  }
+  if (!Array.isArray(replay.gaps) || replay.gaps.length !== replay.orders.length) {
+    errors.push(
+      `${label}: gaps must be an array parallel to orders (expected length ${replay.orders.length}, got ${Array.isArray(replay.gaps) ? replay.gaps.length : typeof replay.gaps})`
+    );
+  } else {
+    replay.gaps.forEach((lapGaps, lapIndex) => {
+      const expectedLength = replay.orders[lapIndex].length;
+      if (!Array.isArray(lapGaps) || lapGaps.length !== expectedLength) {
+        errors.push(
+          `${label}: gaps[${lapIndex}] length ${Array.isArray(lapGaps) ? lapGaps.length : typeof lapGaps} does not match orders[${lapIndex}] length ${expectedLength}`
+        );
+      }
+    });
+  }
 }
 
 if (errors.length > 0) {

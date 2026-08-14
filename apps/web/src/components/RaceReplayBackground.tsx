@@ -76,6 +76,17 @@ function currentOrder(replay: RaceReplay, lap: number) {
   return [...recorded, ...missing];
 }
 
+// Real gap-to-leader in seconds for this lap, keyed by driver id -- parallel
+// to replay.orders (see raceReplays.ts). Drivers with no recorded timing
+// this lap (rare: pre-classification laps, data gaps) are absent from the
+// map; callers fall back to a synthetic spread only for those.
+function currentGaps(replay: RaceReplay, lap: number): Map<string, number> {
+  const index = Math.min(lap, replay.orders.length - 1);
+  const order = replay.orders[index] ?? [];
+  const gaps = replay.gaps[index] ?? [];
+  return new Map(order.map((driverId, i) => [driverId, gaps[i] ?? 0]));
+}
+
 function displayStatus(driver: RaceReplayDriver, lap: number) {
   if (driver.lapsCompleted === 0) {
     return driver.status === "Withdrew" ? "WD" : "DNS";
@@ -94,6 +105,7 @@ function RaceLayer({ replay, elapsedMs }: { replay: RaceReplay; elapsedMs: numbe
   const lap = Math.min(Math.floor(exactLap), replay.totalLaps);
   const lapFraction = exactLap - Math.floor(exactLap);
   const order = currentOrder(replay, lap);
+  const gapsByDriver = useMemo(() => currentGaps(replay, lap), [replay, lap]);
   const drivers = useMemo(
     () => new Map(replay.drivers.map((driver) => [driver.id, driver])),
     [replay]
@@ -111,7 +123,14 @@ function RaceLayer({ replay, elapsedMs }: { replay: RaceReplay; elapsedMs: numbe
             if (!driver) return null;
             const active = lap <= driver.lapsCompleted && driver.lapsCompleted > 0;
             if (!active) return null;
-            const spread = Math.min(0.92, position * 0.028);
+            const gapS = gapsByDriver.get(driverId);
+            // Real gap-to-leader (seconds) / average lap time = fraction of
+            // the track loop this car is behind -- reflects how the race
+            // actually spread out, not a fixed distance per grid position.
+            const spread =
+              gapS !== undefined
+                ? Math.max(0, gapS / replay.avgLapTimeS)
+                : Math.min(0.92, position * 0.028);
             const pose = poseAt(circuit, lapFraction - spread);
             return (
               <g
