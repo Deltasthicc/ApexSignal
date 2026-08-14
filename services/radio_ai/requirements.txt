@@ -16,7 +16,12 @@ torchcodec>=0.10  # torchaudio.load() delegates to this since torchaudio 2.9+; m
 soundfile>=0.12
 numpy>=1.24  # imported directly in asr.py/audio_preprocessing.py/pipeline.py/tone.py -- pin it, don't rely on a transitive torch/transformers version
 
-# Complaint classifier: DeBERTa v3 zero-shot NLI (sentencepiece tokenizer)
+# Complaint classifier: embedding-prototype backend (default as of
+# 2026-08-14, see VALIDATION_GATES.md gate 6d), plus NLI (DeBERTa v3
+# zero-shot, sentencepiece tokenizer) kept selectable via
+# CLASSIFIER_BACKEND. Version constraint matches services/core_api's
+# own sentence-transformers pin for consistency, not a fresh choice.
+sentence-transformers>=3.0
 sentencepiece>=0.2
 
 huggingface_hub>=0.24

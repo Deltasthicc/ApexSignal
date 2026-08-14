@@ -61,16 +61,35 @@ class ModelConfig:
     CLASSIFIER_FALLBACK_MODEL_REVISION = os.environ.get(
         "CLASSIFIER_FALLBACK_MODEL_REVISION", "262ae02f29173eec1c250f90804dc7edc677dcff"
     )
-    # Switched to xsmall on 2026-08-14 after the classify() key-mismatch
-    # fix and Gate 6 re-run: xsmall's corrected macro-F1 (0.393) beats
-    # base's (0.258) by 13.5pp, wins on NO_COMPLAINT (the most common
-    # real-world class) and FRONT_TURNIN_BRAKE, loses only on
-    # MECHANICAL_OTHER. Neither model handles EXIT_TRACTION_REAR at all
-    # (0.000 both), so this costs nothing on the curated demo's own
-    # category. See VALIDATION_GATES.md gate 6c for the full breakdown
-    # and human sign-off record.
-    USE_CLASSIFIER_FALLBACK = (
-        os.environ.get("USE_CLASSIFIER_FALLBACK", "true").lower() == "true"
+
+    # Backend selection for app/complaint_classifier.py::classify().
+    # History: nli-base (Day-2 default) -> nli-xsmall (2026-08-14, gate
+    # 6c: xsmall's corrected macro-F1 0.393 beat base's 0.258 by 13.5pp)
+    # -> embedding (same day, gate 6d: a genuinely different
+    # architecture -- sentence embeddings + prototype cosine similarity
+    # -- measured macro-F1 0.454, beating xsmall by 6.1pp). See
+    # VALIDATION_GATES.md gate 6d and GATE6_ERROR_ANALYSIS.md "Attempt
+    # 4" for the full sweep this is based on. NLI stays selectable
+    # (nli-base / nli-xsmall) in case a later experiment makes it
+    # competitive again -- flip this back explicitly if so, with the
+    # numbers recorded, not silently.
+    #
+    # Supersedes the old USE_CLASSIFIER_FALLBACK boolean (removed
+    # 2026-08-14) -- this one switch now covers all three options that
+    # flag only gated two of.
+    CLASSIFIER_BACKEND = os.environ.get("CLASSIFIER_BACKEND", "embedding")
+
+    # --- Embedding-prototype classifier backend (CLASSIFIER_BACKEND=embedding) --
+    # Verified against the live HF Hub API before adoption (2026-08-14):
+    # exists, ungated, Apache-2.0, sha as pinned below -- same bar every
+    # other model in this file was held to. Already a dependency of
+    # services/core_api's retrieval module, so not a new unknown to this
+    # project's stack, just to radio_ai's own venv/requirements.txt.
+    EMBEDDING_MODEL_ID = os.environ.get(
+        "EMBEDDING_MODEL_ID", "sentence-transformers/all-MiniLM-L6-v2"
+    )
+    EMBEDDING_MODEL_REVISION = os.environ.get(
+        "EMBEDDING_MODEL_REVISION", "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
     )
 
     # --- Development corpus ------------------------------------------
@@ -176,15 +195,30 @@ class ClassifierConfig:
         "VISIBILITY_TRACK_CONDITION",
     ]
 
-    # Calibrated from the Gate 6 benchmark (58 human-labeled transcripts,
-    # see VALIDATION_GATES.md gate 6). The first calibration pass (0.15)
+    # Only used when CLASSIFIER_BACKEND is nli-base or nli-xsmall (see
+    # ModelConfig) -- the embedding backend uses
+    # EMBEDDING_SIMILARITY_MARGIN below instead. Calibrated from the
+    # Gate 6 benchmark (58 human-labeled transcripts, see
+    # VALIDATION_GATES.md gate 6). The first calibration pass (0.15)
     # was measured against a benchmark_classifier.py that didn't match
     # this module's actual candidate-label construction (bare taxonomy
     # keys vs. the real descriptive hypotheses complaint_classifier.py
     # uses) -- fixed 2026-08-14, re-swept. 0.45 was base's genuine best
-    # point (macro-F1 0.258); 0.15 is xsmall's (macro-F1 0.393), and
-    # USE_CLASSIFIER_FALLBACK above now defaults to xsmall as of the
-    # 2026-08-14 gate 6c human sign-off -- this threshold must move with
-    # it. n=58, one dataset -- revisit as more labeled transcripts
-    # accumulate.
+    # point (macro-F1 0.258); 0.15 is xsmall's (macro-F1 0.393). Kept
+    # here for whichever NLI variant gets selected via
+    # CLASSIFIER_BACKEND; if you switch back to nli-xsmall, use 0.15,
+    # not this default. n=58, one dataset -- revisit as more labeled
+    # transcripts accumulate.
     NULL_THRESHOLD = float(os.environ.get("CLASSIFIER_NULL_THRESHOLD", "0.15"))
+
+    # Similarity margin for the embedding-prototype backend
+    # (app/complaint_classifier.py, CLASSIFIER_BACKEND=embedding).
+    # Swept 0.00-0.30 against the same 58-example Gate 6 benchmark
+    # (scripts/experiment_embedding_classifier.py) -- 0.16 is the
+    # genuine best point (macro-F1 0.454). Sits on a noisy part of the
+    # sweep curve (0.16->0.454, 0.18->0.384) -- n=58 is thin, see
+    # GATE6_ERROR_ANALYSIS.md "Attempt 4" before trusting this past
+    # this specific sample.
+    EMBEDDING_SIMILARITY_MARGIN = float(
+        os.environ.get("EMBEDDING_SIMILARITY_MARGIN", "0.16")
+    )

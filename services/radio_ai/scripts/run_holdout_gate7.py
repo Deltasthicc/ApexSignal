@@ -141,10 +141,25 @@ def main(count: int, out_dir: Path, report_path: Path, seed: int) -> None:
         f"- ASR: `{ModelConfig.ASR_MODEL_ID}` @ `{ModelConfig.ASR_MODEL_REVISION}`",
         f"- Tone encoder: `{ModelConfig.TONE_ENCODER_ID}` @ `{ModelConfig.TONE_ENCODER_REVISION}`",
         f"- Tone heads: `{ModelConfig.TONE_HEADS_ID}` @ `{ModelConfig.TONE_HEADS_REVISION}`",
-        f"- Classifier: `{ModelConfig.CLASSIFIER_MODEL_ID}` @ `{ModelConfig.CLASSIFIER_MODEL_REVISION}`",
+        f"- Classifier backend: `{ModelConfig.CLASSIFIER_BACKEND}`",
+        (
+            f"- Classifier: `{ModelConfig.EMBEDDING_MODEL_ID}` @ `{ModelConfig.EMBEDDING_MODEL_REVISION}`, "
+            f"similarity margin: `{ClassifierConfig.EMBEDDING_SIMILARITY_MARGIN}`"
+            if ModelConfig.CLASSIFIER_BACKEND == "embedding"
+            else (
+                f"- Classifier: `{ModelConfig.CLASSIFIER_FALLBACK_MODEL_ID}` @ "
+                f"`{ModelConfig.CLASSIFIER_FALLBACK_MODEL_REVISION}`, "
+                f"null threshold: `{ClassifierConfig.NULL_THRESHOLD}`"
+                if ModelConfig.CLASSIFIER_BACKEND == "nli-xsmall"
+                else (
+                    f"- Classifier: `{ModelConfig.CLASSIFIER_MODEL_ID}` @ "
+                    f"`{ModelConfig.CLASSIFIER_MODEL_REVISION}`, "
+                    f"null threshold: `{ClassifierConfig.NULL_THRESHOLD}`"
+                )
+            )
+        ),
         f"- Arousal threshold: `{ToneThresholds.AROUSAL_ELEVATED_THRESHOLD}`, "
-        f"fatigue threshold: `{ToneThresholds.FATIGUE_THRESHOLD}`, "
-        f"classifier null threshold: `{ClassifierConfig.NULL_THRESHOLD}`",
+        f"fatigue threshold: `{ToneThresholds.FATIGUE_THRESHOLD}`",
         "",
         "## Clips",
         "",
