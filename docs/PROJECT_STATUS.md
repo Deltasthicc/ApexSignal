@@ -21,7 +21,9 @@ required before describing ApexSignal as a live, production race-operations
 system:
 
 1. License and curate incident-specific radio plus aligned FastF1 telemetry.
-2. Create a genuinely untouched radio holdout set and complete Gate 7.
+2. Re-run the Gate 7 holdout (`services/radio_ai/HOLDOUT_REPORT.md`) on the
+   final calibrated classifier threshold -- the untouched 20-clip holdout
+   itself is done, but that report predates the Gate 6 recalibration.
 3. Improve complaint classification beyond the recorded Gate 6 macro-F1.
 4. Deploy `radio_ai` on GPU-capable infrastructure and the live `core_api` with
    persistent storage/FAISS.

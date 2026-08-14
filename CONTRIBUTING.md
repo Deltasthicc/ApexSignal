@@ -28,6 +28,15 @@ workstream whose service reads or writes that contract.
 Work on your workstream branch, open a PR into `integration/main`. Never
 push directly to `integration/main`.
 
+> **Note on `main`:** GitHub's default branch for this repo is `main`,
+> not `integration/main`, and presentation-polish commits have been
+> pushed directly to `main` outside this PR flow. The two branches
+> share full history but `main` is currently ahead. CI now runs on
+> both (`.github/workflows/tests.yml`), but until the team picks one
+> branch as canonical, confirm which branch you're building on before
+> assuming "integration/main" and "the deployed site" are the same
+> commit.
+
 ## Integration principle
 
 Integrate on Day 1 with mocks, not on Day 4 with finished modules.

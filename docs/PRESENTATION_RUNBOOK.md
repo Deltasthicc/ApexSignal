@@ -19,8 +19,10 @@ continues even while Render's free service wakes. The status chip says
    unified Incident Card. Emphasize separate evidence components rather than a
    magic risk score.
 3. **Reference replay (35s).** Press **Play Replay**, open Lap 14, then Lap 17.
-   Show the historical match, -9.4% throttle-pickup delta, +0.24s sector delta,
-   and 189.4s measured lead time.
+   Show the historical match, -9.4% throttle-pickup delta, +0.24s sector delta.
+   Lap 17 is the same complaint recurring; separately, that Lap 17 radio call's
+   own 54.6s lead time to a measurable change is a different fact, don't merge
+   the two into one number when narrating.
 4. **Before/after (15s).** Toggle **Pit Wall View**. Explain that the raw view
    has radio plus lap timing; ApexSignal adds tone, taxonomy, baseline evidence,
    historical retrieval, and uncertainty-aware wording.
