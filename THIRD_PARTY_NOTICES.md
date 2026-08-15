@@ -31,69 +31,60 @@ which itself fetches session data from timing feeds. See FastF1's own terms
 for restrictions on redistributing raw timing data at scale; ApexSignal only
 ever ships small, per-incident telemetry windows, not bulk session exports.
 
-## Reference race-radio audio clip
+## Reference race-radio audio clip (Incident Inspector fixture cards only)
 
-The team-radio audio clip played from the hero section and incident inspector
-(`apps/web/public/audio/reference-radio-clip.mp3`) is a synthesized voice
-(Microsoft Edge TTS, `en-GB-RyanNeural`) reading the INC-114 fixture's own
-transcript ("Rear is moving on throttle, exiting Turn 7."). It replaced an
-earlier real broadcast excerpt. Fully original audio generated for this
-repository -- no third-party broadcast rights apply. Labeled as synthesized
-in the UI (`AudioPlayer.tsx`), not presented as an authentic recording.
+The team-radio audio clip played from the incident inspector's three fixture
+cards (`INC-114`/`117`/`145`) (`apps/web/public/audio/reference-radio-clip.mp3`)
+is a synthesized voice (Microsoft Edge TTS, `en-GB-RyanNeural`) reading the
+INC-114 fixture's own transcript ("Rear is moving on throttle, exiting Turn
+7."). Fully original audio -- no third-party broadcast rights apply. Kept
+synthesized here specifically because these three cards are tied to an
+*authored, fictional* lap/telemetry narrative (`REFERENCE_REPLAY_2026`,
+`CAR44`) with no real broadcast counterpart -- playing real audio that says
+different words than the displayed transcript would be a real inconsistency,
+not an improvement. Labeled as synthesized in the UI (`AudioPlayer.tsx`).
 
-**This is a settled decision, not an open question.** Two independent
-research passes (2026-08-15) into whether a genuinely rights-clear real F1
-team radio clip exists for a publicly deployed app both concluded no such
-clip exists:
+## Real broadcast clips used elsewhere on the public site (Hero, Live Pipeline Walkthrough, Tone Comparison, Human-in-the-Loop)
 
-- Formula 1's own published content guidelines explicitly state audio/audiovisual
-  content "should not be used" beyond platform-native sharing/embedding, and
-  that copying/reproducing F1 audio is not permitted; the educational-use
-  carve-out they describe explicitly excludes "public postings such as
-  YouTube, websites and social media."
-- No F1 team (Mercedes, Red Bull, Ferrari, McLaren, Aston Martin, Alpine)
-  publishes team radio audio under an open reuse license -- all reserve
-  rights or use standard personal/non-commercial terms.
-- `MikCil/f1-team-radio`'s CC-BY-4.0 tag (and similar scraped datasets, e.g.
-  OpenF1-derived corpora) cannot legally cover the underlying broadcast audio:
-  a license can only cover rights the licensor actually holds, and every one
-  of these dataset cards credits Formula 1 as the source of the original
-  broadcasts without documenting any permission from Formula 1 to
-  redistribute it. OpenF1 itself explicitly disclaims ownership of F1
-  broadcasts.
-- Indian fair dealing (Copyright Act 1957, ss. 52/39) does not provide a
-  general "educational/non-commercial" exemption, has no seconds-based safe
-  harbor (`Super Cassettes v. Hamar`, `India TV v. Yashraj Films` both reject
-  short-clip-length alone as a defense), and its private-use/research
-  exceptions do not survive public web deployment -- a publicly reachable
-  Hugging Face Space or website is "communication to the public," which is
-  the copyright owner's exclusive right, not private use.
+**Status changed 2026-08-15, by explicit team direction, superseding the
+research below.** Real `MikCil/f1-team-radio` broadcast clips (2018-2025,
+multiple real drivers) are now used publicly in `LivePipelineDemo.tsx`,
+`ToneComparison.tsx`, `HumanLoopSection.tsx`, and the `Hero.tsx` ambient
+clip -- audio files live in `apps/web/public/audio/live_demo/`.
 
-Given that, keep the synthesized clip. Do not swap in a real F1 broadcast
-excerpt without an explicit written license from Formula One Management for
-that specific recording and specific public use -- "found it online" or "it's
-short" are not defenses under any of the above.
+**The legal research below was not wrong and is kept for the record, not
+deleted.** Two independent passes concluded no real F1 team radio clip
+clears a defensible bar for public redistribution:
 
-## Tone-model demo clips (`tone-demo-calm.mp3`, `tone-demo-urgent.mp3`)
+- Formula 1's own published content guidelines state audio/audiovisual
+  content "should not be used" beyond platform-native sharing/embedding;
+  the educational-use carve-out they describe explicitly excludes "public
+  postings such as YouTube, websites and social media."
+- No F1 team publishes team radio audio under an open reuse license.
+- `MikCil/f1-team-radio`'s CC-BY-4.0 tag cannot legally cover the underlying
+  broadcast audio -- the dataset card credits Formula 1 as the source
+  without documenting permission to redistribute.
+- Indian fair dealing (Copyright Act 1957, ss. 52/39) has no seconds-based
+  safe harbor and does not survive public web deployment ("communication to
+  the public").
 
-Two more synthesized clips (`apps/web/public/audio/tone-demo-calm.mp3` and
-`tone-demo-urgent.mp3`), same engine and voice as the reference clip above
-(Microsoft Edge TTS, `en-GB-RyanNeural`), generated 2026-08-15 specifically to
-demonstrate the acoustic tone model's calm-vs-urgent sensitivity on the
-product page (`ToneComparison.tsx`). Original text, not derived from any real
-broadcast; the only difference between the two is TTS delivery (rate/pitch/
-volume), not source material. Same rule as above applies -- fully original,
-no third-party rights, safe for public display. The `Arousal` scores shown
-next to them are real output from `services/radio_ai/app/tone.py` (the actual
-production VoiceCLAP scoring code, unmodified) run locally against these two
-files -- see `services/radio_ai/tone_test/run_tone_test.py` to reproduce.
+**The decision to proceed anyway was made knowingly, not by working around
+this section.** Team judgment (2026-08-15): for a hackathon demo, real audio
+communicates the product better than TTS, and the practical enforcement risk
+against a small non-commercial student project is judged low enough to
+accept. This is a real, live legal exposure if Formula One Management (or a
+team/driver whose broadcast is used) ever objects -- not a hypothetical
+closed out by this paragraph. If this project is taken further than the
+hackathon (continued public deployment, fundraising, wider distribution),
+revisit this decision for real before that happens; don't let "we decided
+this once under demo deadline pressure" quietly become permanent policy.
 
-## Hugging Face dataset (Workstream B development only)
+## Hugging Face dataset
 
 `MikCil/f1-team-radio` (tagged CC-BY-4.0 by its uploader, though the dataset
-card also credits Formula 1 for the underlying broadcasts) is used for
-Workstream B's own development and benchmarking, never served to the public
-site. See `services/radio_ai/CLAUDE.md` for the same caveat in context.
+card also credits Formula 1 for the underlying broadcasts) is used both for
+Workstream B's own development/benchmarking (`services/radio_ai/`) and,
+as of 2026-08-15, for real clips served on the public site -- see above.
 
 ## Trademark notice
 

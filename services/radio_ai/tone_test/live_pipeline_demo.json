@@ -1,0 +1,427 @@
+{
+  "flagship_id": "2023_Monaco_Grand_Prix_NICHUL01_27_20230528_144112",
+  "clips": [
+    {
+      "id": "2018_Abu_Dhabi_Grand_Prix_LEWHAM01_44_20181125_180520",
+      "src": "/audio/live_demo/2018_Abu_Dhabi_Grand_Prix_LEWHAM01_44_20181125_180520.mp3",
+      "transcript": "My tires definitely don't feel great. Ok, copy.",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.583,
+      "tone_confidence": 0.583,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.529,
+      "echo_match": {
+        "id": "2018_Abu_Dhabi_Grand_Prix_STOVAN01_2_20181125_181031",
+        "transcript": "These tires are not doing well! Copy",
+        "similarity": 0.744
+      }
+    },
+    {
+      "id": "2018_Abu_Dhabi_Grand_Prix_STOVAN01_2_20181125_181031",
+      "src": "/audio/live_demo/2018_Abu_Dhabi_Grand_Prix_STOVAN01_2_20181125_181031.mp3",
+      "transcript": "These tires are not doing well! Copy",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.664,
+      "tone_confidence": 0.664,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.494,
+      "echo_match": {
+        "id": "2018_Abu_Dhabi_Grand_Prix_LEWHAM01_44_20181125_180520",
+        "transcript": "My tires definitely don't feel great. Ok, copy.",
+        "similarity": 0.744
+      }
+    },
+    {
+      "id": "2018_Austrian_Grand_Prix_MAXVER01_33_20180701_162236",
+      "src": "/audio/live_demo/2018_Austrian_Grand_Prix_MAXVER01_33_20180701_162236.mp3",
+      "transcript": "I'll have their tyres compared to mine. They're okay on tyres at the moment Max. We are happy with yours.",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.652,
+      "tone_confidence": 0.652,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.483,
+      "echo_match": {
+        "id": "2018_Abu_Dhabi_Grand_Prix_STOVAN01_2_20181125_181031",
+        "transcript": "These tires are not doing well! Copy",
+        "similarity": 0.642
+      }
+    },
+    {
+      "id": "2018_Italian_Grand_Prix_LEWHAM01_44_20180902_154030",
+      "src": "/audio/live_demo/2018_Italian_Grand_Prix_LEWHAM01_44_20180902_154030.mp3",
+      "transcript": "Okay, copy, just keep the information coming.",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.65,
+      "tone_confidence": 0.65,
+      "category": null,
+      "category_confidence": null,
+      "echo_match": null
+    },
+    {
+      "id": "2018_Japanese_Grand_Prix_MAXVER01_33_20181007_151902",
+      "src": "/audio/live_demo/2018_Japanese_Grand_Prix_MAXVER01_33_20181007_151902.mp3",
+      "transcript": "Tired temperatures are stable, they've been very stable over the last five laps.",
+      "tone_label": "CALM",
+      "tone_score": 0.688,
+      "tone_confidence": 0.688,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.4,
+      "echo_match": {
+        "id": "2020_Turkish_Grand_Prix_ESTOCO01_31_20201115_105452",
+        "transcript": "Tire temperatures are all still good.",
+        "similarity": 0.581
+      }
+    },
+    {
+      "id": "2018_Mexican_Grand_Prix_LEWHAM01_44_20181028_132341",
+      "src": "/audio/live_demo/2018_Mexican_Grand_Prix_LEWHAM01_44_20181028_132341.mp3",
+      "transcript": "The tyres are quite fragile.",
+      "tone_label": "CALM",
+      "tone_score": 0.524,
+      "tone_confidence": 0.524,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.52,
+      "echo_match": {
+        "id": "2023_Belgian_Grand_Prix_ALEALB01_23_20230730_153213",
+        "transcript": "A lot of people struggle with the tyres, but it's a great overtake today, there's quite a few of them.",
+        "similarity": 0.692
+      }
+    },
+    {
+      "id": "2019_Bahrain_Grand_Prix_DANRIC01_3_20190331_171947",
+      "src": "/audio/live_demo/2019_Bahrain_Grand_Prix_DANRIC01_3_20190331_171947.mp3",
+      "transcript": "Yeah, still the rear has hurt me on traction, but struggling a lot with front locking, so trying to talk about coming rearwards. Okay, understood.",
+      "tone_label": "FATIGUED",
+      "tone_score": 0.669,
+      "tone_confidence": 0.669,
+      "category": "EXIT_TRACTION_REAR",
+      "category_confidence": 0.549,
+      "echo_match": {
+        "id": "2019_Canadian_Grand_Prix_GEORUS01_63_20190609_183634",
+        "transcript": "I've got a bit of rear instability into turn 6 under braking on the entry phase. This is something I experienced a bit in P2 as well. Just lucky if there's anything we can do with tools to improve that.",
+        "similarity": 0.517
+      }
+    },
+    {
+      "id": "2019_Brazilian_Grand_Prix_LEWHAM01_44_20191117_171148",
+      "src": "/audio/live_demo/2019_Brazilian_Grand_Prix_LEWHAM01_44_20191117_171148.mp3",
+      "transcript": "I don't know why, but I got a big difference between two, front breaker.",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.654,
+      "tone_confidence": 0.654,
+      "category": "FRONT_TURNIN_BRAKE",
+      "category_confidence": 0.354,
+      "echo_match": {
+        "id": "2023_Bahrain_Grand_Prix_NICHUL01_27_20230305_152700",
+        "transcript": "When I get very close in braking, the front is just like it has uplift.",
+        "similarity": 0.405
+      }
+    },
+    {
+      "id": "2019_Canadian_Grand_Prix_GEORUS01_63_20190609_183634",
+      "src": "/audio/live_demo/2019_Canadian_Grand_Prix_GEORUS01_63_20190609_183634.mp3",
+      "transcript": "I've got a bit of rear instability into turn 6 under braking on the entry phase. This is something I experienced a bit in P2 as well. Just lucky if there's anything we can do with tools to improve that.",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.524,
+      "tone_confidence": 0.524,
+      "category": "EXIT_TRACTION_REAR",
+      "category_confidence": 0.574,
+      "echo_match": {
+        "id": "2019_Bahrain_Grand_Prix_DANRIC01_3_20190331_171947",
+        "transcript": "Yeah, still the rear has hurt me on traction, but struggling a lot with front locking, so trying to talk about coming rearwards. Okay, understood.",
+        "similarity": 0.517
+      }
+    },
+    {
+      "id": "2019_Mexican_Grand_Prix_KEVMAG01_20_20191027_192529",
+      "src": "/audio/live_demo/2019_Mexican_Grand_Prix_KEVMAG01_20_20191027_192529.mp3",
+      "transcript": "Kevin, brake balance one click forward, we have a lot of rear locking. Same pace as cars ahead, good job. No sign of grading. No sign. Yes, understood. Rear overheating very high. Brake balance forward, if you can take it, will help. The lift and coast will help.",
+      "tone_label": "CALM",
+      "tone_score": 0.685,
+      "tone_confidence": 0.685,
+      "category": "FRONT_TURNIN_BRAKE",
+      "category_confidence": 0.547,
+      "echo_match": {
+        "id": "2019_Spanish_Grand_Prix_SERPER01_11_20190512_145338",
+        "transcript": "Consider diff and brake balance to help front left slips, help front left slips 5, 10, 14.",
+        "similarity": 0.544
+      }
+    },
+    {
+      "id": "2019_Spanish_Grand_Prix_SERPER01_11_20190512_145338",
+      "src": "/audio/live_demo/2019_Spanish_Grand_Prix_SERPER01_11_20190512_145338.mp3",
+      "transcript": "Consider diff and brake balance to help front left slips, help front left slips 5, 10, 14.",
+      "tone_label": "CALM",
+      "tone_score": 0.511,
+      "tone_confidence": 0.511,
+      "category": "FRONT_TURNIN_BRAKE",
+      "category_confidence": 0.507,
+      "echo_match": {
+        "id": "2019_Mexican_Grand_Prix_KEVMAG01_20_20191027_192529",
+        "transcript": "Kevin, brake balance one click forward, we have a lot of rear locking. Same pace as cars ahead, good job. No sign of grading. No sign. Yes, understood. Rear overheating very high. Brake balance forward, if you can take it, will help. The lift and coast will help.",
+        "similarity": 0.544
+      }
+    },
+    {
+      "id": "2020_Belgian_Grand_Prix_ESTOCO01_31_20200830_145109",
+      "src": "/audio/live_demo/2020_Belgian_Grand_Prix_ESTOCO01_31_20200830_145109.mp3",
+      "transcript": "Tire temps are stabilised and are good.",
+      "tone_label": "CALM",
+      "tone_score": 0.745,
+      "tone_confidence": 0.745,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.543,
+      "echo_match": {
+        "id": "2020_Turkish_Grand_Prix_ESTOCO01_31_20201115_105452",
+        "transcript": "Tire temperatures are all still good.",
+        "similarity": 0.793
+      }
+    },
+    {
+      "id": "2020_Spanish_Grand_Prix_SERPER01_11_20200816_142358",
+      "src": "/audio/live_demo/2020_Spanish_Grand_Prix_SERPER01_11_20200816_142358.mp3",
+      "transcript": "So what are the days? So Checo, tyres are looking ok at the moment but they are at the hottest so slip management now is critical",
+      "tone_label": "CALM",
+      "tone_score": 0.698,
+      "tone_confidence": 0.698,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.561,
+      "echo_match": {
+        "id": "2018_Austrian_Grand_Prix_MAXVER01_33_20180701_162236",
+        "transcript": "I'll have their tyres compared to mine. They're okay on tyres at the moment Max. We are happy with yours.",
+        "similarity": 0.626
+      }
+    },
+    {
+      "id": "2020_Turkish_Grand_Prix_ESTOCO01_31_20201115_105452",
+      "src": "/audio/live_demo/2020_Turkish_Grand_Prix_ESTOCO01_31_20201115_105452.mp3",
+      "transcript": "Tire temperatures are all still good.",
+      "tone_label": "FATIGUED",
+      "tone_score": 0.54,
+      "tone_confidence": 0.54,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.528,
+      "echo_match": {
+        "id": "2020_Belgian_Grand_Prix_ESTOCO01_31_20200830_145109",
+        "transcript": "Tire temps are stabilised and are good.",
+        "similarity": 0.793
+      }
+    },
+    {
+      "id": "2021_French_Grand_Prix_GEORUS01_63_20210620_132947",
+      "src": "/audio/live_demo/2021_French_Grand_Prix_GEORUS01_63_20210620_132947.mp3",
+      "transcript": "On a couple of occasions there was a bit of vibration from the front axle when breaking, but nothing crazy.",
+      "tone_label": "CALM",
+      "tone_score": 0.697,
+      "tone_confidence": 0.697,
+      "category": "MECHANICAL_OTHER",
+      "category_confidence": 0.531,
+      "echo_match": null
+    },
+    {
+      "id": "2021_Mexico_City_Grand_Prix_LEWHAM01_44_20211107_192411",
+      "src": "/audio/live_demo/2021_Mexico_City_Grand_Prix_LEWHAM01_44_20211107_192411.mp3",
+      "transcript": "You",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.586,
+      "tone_confidence": 0.586,
+      "category": null,
+      "category_confidence": null,
+      "echo_match": null
+    },
+    {
+      "id": "2021_Mexico_City_Grand_Prix_MAXVER01_33_20211107_200820",
+      "src": "/audio/live_demo/2021_Mexico_City_Grand_Prix_MAXVER01_33_20211107_200820.mp3",
+      "transcript": "The all-tire surface condition looks very good, Matt.",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.518,
+      "tone_confidence": 0.518,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.524,
+      "echo_match": {
+        "id": "2020_Belgian_Grand_Prix_ESTOCO01_31_20200830_145109",
+        "transcript": "Tire temps are stabilised and are good.",
+        "similarity": 0.578
+      }
+    },
+    {
+      "id": "2021_Styrian_Grand_Prix_LEWHAM01_44_20210627_141517",
+      "src": "/audio/live_demo/2021_Styrian_Grand_Prix_LEWHAM01_44_20210627_141517.mp3",
+      "transcript": "Okay, place lock improved. Standby. So main area is braking turn three, braking turn four.",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.51,
+      "tone_confidence": 0.51,
+      "category": "FRONT_TURNIN_BRAKE",
+      "category_confidence": 0.497,
+      "echo_match": {
+        "id": "2025_Monaco_Grand_Prix_GEORUS01_63_20250525_160515",
+        "transcript": "It's driving dangerously slow, the slamming of the brakes at all areas. Copy that.",
+        "similarity": 0.518
+      }
+    },
+    {
+      "id": "2021_Styrian_Grand_Prix_MAXVER01_33_20210627_150417",
+      "src": "/audio/live_demo/2021_Styrian_Grand_Prix_MAXVER01_33_20210627_150417.mp3",
+      "transcript": "Max, so specifically the issue is breaking turn 10 whilst on the curb, just for information.",
+      "tone_label": "CALM",
+      "tone_score": 0.533,
+      "tone_confidence": 0.533,
+      "category": null,
+      "category_confidence": null,
+      "echo_match": null
+    },
+    {
+      "id": "2021_Styrian_Grand_Prix_MAXVER01_33_20210627_150731",
+      "src": "/audio/live_demo/2021_Styrian_Grand_Prix_MAXVER01_33_20210627_150731.mp3",
+      "transcript": "Hey Max, so specifically the issue is breaking turn 10 whilst on the kerb. Just for information. Gap 7.5 Seen that. A change in wind.",
+      "tone_label": "CALM",
+      "tone_score": 0.503,
+      "tone_confidence": 0.503,
+      "category": "FRONT_TURNIN_BRAKE",
+      "category_confidence": 0.338,
+      "echo_match": null
+    },
+    {
+      "id": "2021_S\u00e3o_Paulo_Grand_Prix_LANSTR01_18_20211114_170941",
+      "src": "/audio/live_demo/2021_S\u00e3o_Paulo_Grand_Prix_LANSTR01_18_20211114_170941.mp3",
+      "transcript": "Feels like there's a lot of understeer now. I think there's quite a bit of damage. Yeah, copy, copy. If you've got understeer, go the other way with the diff. Open the diff to reduce the understeer. Down on diff mid as well if you need. Can you confirm if there's a lot of damage? Be more specific. Yes. We have damage to the left hand side forward floor. We're checking on the numbers. But the car is okay to push for now. Yeah, it feels terrible. There's no grip, but I think I'm losing a lot of load.",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.654,
+      "tone_confidence": 0.654,
+      "category": "FRONT_TURNIN_BRAKE",
+      "category_confidence": 0.502,
+      "echo_match": {
+        "id": "2023_Monaco_Grand_Prix_NICHUL01_27_20230528_144112",
+        "transcript": "A lot of understeer creeping in. All speeds but also traction. Getting very poor.",
+        "similarity": 0.605
+      }
+    },
+    {
+      "id": "2023_Bahrain_Grand_Prix_NICHUL01_27_20230305_152700",
+      "src": "/audio/live_demo/2023_Bahrain_Grand_Prix_NICHUL01_27_20230305_152700.mp3",
+      "transcript": "When I get very close in braking, the front is just like it has uplift.",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.568,
+      "tone_confidence": 0.568,
+      "category": "FRONT_TURNIN_BRAKE",
+      "category_confidence": 0.57,
+      "echo_match": {
+        "id": "2025_Monaco_Grand_Prix_GEORUS01_63_20250525_160515",
+        "transcript": "It's driving dangerously slow, the slamming of the brakes at all areas. Copy that.",
+        "similarity": 0.602
+      }
+    },
+    {
+      "id": "2023_Belgian_Grand_Prix_ALEALB01_23_20230730_153213",
+      "src": "/audio/live_demo/2023_Belgian_Grand_Prix_ALEALB01_23_20230730_153213.mp3",
+      "transcript": "A lot of people struggle with the tyres, but it's a great overtake today, there's quite a few of them.",
+      "tone_label": "CALM",
+      "tone_score": 0.685,
+      "tone_confidence": 0.685,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.527,
+      "echo_match": {
+        "id": "2018_Mexican_Grand_Prix_LEWHAM01_44_20181028_132341",
+        "transcript": "The tyres are quite fragile.",
+        "similarity": 0.692
+      }
+    },
+    {
+      "id": "2023_Mexico_City_Grand_Prix_NICHUL01_27_20231029_213013",
+      "src": "/audio/live_demo/2023_Mexico_City_Grand_Prix_NICHUL01_27_20231029_213013.mp3",
+      "transcript": "What's going on at the rear? Certainly, I've lost my rear grip.",
+      "tone_label": "CALM",
+      "tone_score": 0.581,
+      "tone_confidence": 0.581,
+      "category": "FRONT_TURNIN_BRAKE",
+      "category_confidence": 0.468,
+      "echo_match": {
+        "id": "2023_Bahrain_Grand_Prix_NICHUL01_27_20230305_152700",
+        "transcript": "When I get very close in braking, the front is just like it has uplift.",
+        "similarity": 0.491
+      }
+    },
+    {
+      "id": "2023_Monaco_Grand_Prix_NICHUL01_27_20230528_144112",
+      "src": "/audio/live_demo/2023_Monaco_Grand_Prix_NICHUL01_27_20230528_144112.mp3",
+      "transcript": "A lot of understeer creeping in. All speeds but also traction. Getting very poor.",
+      "tone_label": "FATIGUED",
+      "tone_score": 0.536,
+      "tone_confidence": 0.536,
+      "category": "FRONT_TURNIN_BRAKE",
+      "category_confidence": 0.598,
+      "echo_match": {
+        "id": "2021_S\u00e3o_Paulo_Grand_Prix_LANSTR01_18_20211114_170941",
+        "transcript": "Feels like there's a lot of understeer now. I think there's quite a bit of damage. Yeah, copy, copy. If you've got understeer, go the other way with the diff. Open the diff to reduce the understeer. Down on diff mid as well if you need. Can you confirm if there's a lot of damage? Be more specific. Yes. We have damage to the left hand side forward floor. We're checking on the numbers. But the car is okay to push for now. Yeah, it feels terrible. There's no grip, but I think I'm losing a lot of load.",
+        "similarity": 0.605
+      }
+    },
+    {
+      "id": "2023_Spanish_Grand_Prix_OSCPIA01_81_20230604_143516",
+      "src": "/audio/live_demo/2023_Spanish_Grand_Prix_OSCPIA01_81_20230604_143516.mp3",
+      "transcript": "And Oscar confirming that tyre degradation is all thermal. Not worried about where, not worried about graining on this tyre, it's all about thermal management.",
+      "tone_label": "ELEVATED_AROUSAL",
+      "tone_score": 0.528,
+      "tone_confidence": 0.528,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.606,
+      "echo_match": {
+        "id": "2020_Turkish_Grand_Prix_ESTOCO01_31_20201115_105452",
+        "transcript": "Tire temperatures are all still good.",
+        "similarity": 0.619
+      }
+    },
+    {
+      "id": "2024_Belgian_Grand_Prix_KEVMAG01_20_20240728_152713",
+      "src": "/audio/live_demo/2024_Belgian_Grand_Prix_KEVMAG01_20_20240728_152713.mp3",
+      "transcript": "That isn't much better than expected.",
+      "tone_label": "CALM",
+      "tone_score": 0.79,
+      "tone_confidence": 0.79,
+      "category": null,
+      "category_confidence": null,
+      "echo_match": null
+    },
+    {
+      "id": "2024_Mexico_City_Grand_Prix_LIALAW01_30_20241027_152710",
+      "src": "/audio/live_demo/2024_Mexico_City_Grand_Prix_LIALAW01_30_20241027_152710.mp3",
+      "transcript": "Sturglet High School with the front.",
+      "tone_label": "CALM",
+      "tone_score": 0.525,
+      "tone_confidence": 0.525,
+      "category": null,
+      "category_confidence": null,
+      "echo_match": null
+    },
+    {
+      "id": "2024_S\u00e3o_Paulo_Grand_Prix_LANNOR01_4_20241103_151243",
+      "src": "/audio/live_demo/2024_S\u00e3o_Paulo_Grand_Prix_LANNOR01_4_20241103_151243.mp3",
+      "transcript": "If the weather stays as it does, we think it will be these tyres to the end. So it will be about tyre condition and racing cars on track.",
+      "tone_label": "CALM",
+      "tone_score": 0.865,
+      "tone_confidence": 0.865,
+      "category": "TYRE_GRIP_DEGRADATION",
+      "category_confidence": 0.531,
+      "echo_match": {
+        "id": "2020_Spanish_Grand_Prix_SERPER01_11_20200816_142358",
+        "transcript": "So what are the days? So Checo, tyres are looking ok at the moment but they are at the hottest so slip management now is critical",
+        "similarity": 0.617
+      }
+    },
+    {
+      "id": "2025_Monaco_Grand_Prix_GEORUS01_63_20250525_160515",
+      "src": "/audio/live_demo/2025_Monaco_Grand_Prix_GEORUS01_63_20250525_160515.mp3",
+      "transcript": "It's driving dangerously slow, the slamming of the brakes at all areas. Copy that.",
+      "tone_label": "FATIGUED",
+      "tone_score": 0.51,
+      "tone_confidence": 0.51,
+      "category": "FRONT_TURNIN_BRAKE",
+      "category_confidence": 0.524,
+      "echo_match": {
+        "id": "2023_Bahrain_Grand_Prix_NICHUL01_27_20230305_152700",
+        "transcript": "When I get very close in braking, the front is just like it has uplift.",
+        "similarity": 0.602
+      }
+    }
+  ]
+}

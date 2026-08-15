@@ -21,10 +21,12 @@ export function AudioPlayer({
         aria-label={`Play ${clipLabel}`}
       />
       <p className="mt-2 text-[9px] leading-relaxed text-dim">
-        Synthesized voice reading this incident&rsquo;s own transcript &mdash;
-        not a broadcast recording. No real F1 team radio clip clears a
-        defensible bar for public redistribution (researched, settled
-        decision, not a placeholder); see THIRD_PARTY_NOTICES.md.
+        Synthesized voice reading this incident&rsquo;s own transcript
+        &mdash; this card is tied to an authored, fictional lap/telemetry
+        narrative with no real broadcast counterpart, so real audio would
+        say different words than shown above. Real broadcast clips are
+        used elsewhere on this site (see the Live Pipeline Walkthrough);
+        see THIRD_PARTY_NOTICES.md for the full picture.
       </p>
     </div>
   );

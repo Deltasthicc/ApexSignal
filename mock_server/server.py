@@ -28,7 +28,7 @@ FIXTURES_DIR = Path(__file__).resolve().parents[1] / "contracts" / "fixtures"
 
 
 def _load(name: str):
-    return json.loads((FIXTURES_DIR / name).read_text())
+    return json.loads((FIXTURES_DIR / name).read_text(encoding="utf-8"))
 
 
 def _load_per_incident(subdir: str, incident_id: str, default_name: str):
@@ -36,7 +36,7 @@ def _load_per_incident(subdir: str, incident_id: str, default_name: str):
     the single generic sample so unknown ids still return a valid shape."""
     candidate = FIXTURES_DIR / subdir / f"{incident_id}.json"
     if candidate.exists():
-        return json.loads(candidate.read_text())
+        return json.loads(candidate.read_text(encoding="utf-8"))
     payload = _load(default_name)
     payload["incident_id"] = incident_id
     return payload
@@ -80,6 +80,18 @@ def replay_manifest() -> list:
     to probe /v1/replay/frame one index at a time. Additive convenience
     endpoint -- same underlying fixture data as /v1/replay/frame."""
     return _load("incident_manifest.sample.json")
+
+
+@app.get("/v1/live-pipeline")
+def live_pipeline_demo() -> list:
+    """Real pipeline output (ASR, tone, classifier, retrieval) computed
+    once against real MikCil/f1-team-radio broadcast clips by
+    services/radio_ai/tone_test/run_live_pipeline_demo.py, served here so
+    the frontend fetches it over HTTP like every other incident record
+    instead of bundling it as a hardcoded constant. Same "deterministic
+    replay of real computed output" pattern as the rest of this server --
+    not live GPU inference on every request, but not fabricated either."""
+    return _load("live_pipeline_demo.json")
 
 
 # Hugging Face Space mode: serve the exported Next.js site and the fixture API

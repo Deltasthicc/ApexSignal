@@ -42,8 +42,8 @@ def _fixture_assessment_payload(incident_id: str) -> dict:
     to the single generic sample for any id without one, same as before."""
     per_incident = FIXTURES_DIR / "incident_assessment" / f"{incident_id}.json"
     if per_incident.exists():
-        return json.loads(per_incident.read_text())
-    payload = json.loads(FIXTURE_PATH.read_text())
+        return json.loads(per_incident.read_text(encoding="utf-8"))
+    payload = json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
     payload["incident_id"] = incident_id
     return payload
 
@@ -103,10 +103,22 @@ async def replay_manifest() -> list:
     return _load_manifest()
 
 
+@app.get("/v1/live-pipeline")
+async def live_pipeline_demo() -> list:
+    """Real pipeline output (ASR, tone, classifier, retrieval) computed
+    once against real MikCil/f1-team-radio broadcast clips by
+    services/radio_ai/tone_test/run_live_pipeline_demo.py. Served over
+    HTTP like every other incident record -- not bundled into the
+    frontend as a hardcoded constant, and not live GPU inference on
+    every request either; same deterministic-replay pattern as the rest
+    of this API."""
+    return json.loads((FIXTURES_DIR / "live_pipeline_demo.json").read_text(encoding="utf-8"))
+
+
 def _load_manifest() -> list:
     mode = os.environ.get("EVALUATE_MODE", "fixture")
     if mode == "fixture":
-        return json.loads(FIXTURE_MANIFEST_PATH.read_text())
+        return json.loads(FIXTURE_MANIFEST_PATH.read_text(encoding="utf-8"))
 
     settings = load_settings()
     if not settings.manifest_path.exists():
@@ -118,7 +130,7 @@ def _load_manifest() -> list:
                 f"build_incident_manifest.py."
             ),
         )
-    return json.loads(settings.manifest_path.read_text())
+    return json.loads(settings.manifest_path.read_text(encoding="utf-8"))
 
 
 def _evaluate_live(incident_id: str) -> IncidentAssessment:

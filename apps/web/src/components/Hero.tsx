@@ -111,7 +111,7 @@ export function Hero({
             </button>
             <audio
               ref={audioRef}
-              src="/audio/reference-radio-clip.mp3"
+              src="/audio/live_demo/flagship-nichul01-monaco2023.mp3"
               onPlay={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
               onEnded={() => setPlaying(false)}
@@ -126,7 +126,7 @@ export function Hero({
                 <Legend color="bg-gold" label="Deviation observed" />
               </div>
               <span className={playing ? "text-red" : ""}>
-                {playing ? "now playing…" : "synthesized reference clip"}
+                {playing ? "now playing…" : "real broadcast clip · 2023 Monaco GP"}
               </span>
             </div>
           </div>

@@ -10,11 +10,29 @@ export function SessionGrid({
   assessmentCache,
   onSelect,
 }: {
-  entries: ManifestEntry[];
+  entries: ManifestEntry[] | "loading" | "error";
   radioCache: Record<string, Loadable<RadioAnalysisOutput>>;
   assessmentCache: Record<string, Loadable<IncidentAssessment>>;
   onSelect: (id: string) => void;
 }) {
+  if (!Array.isArray(entries) || entries.length === 0) {
+    return (
+      <section id="sessions" className="border-t border-rule bg-bg px-6 py-24">
+        <div className="mx-auto max-w-6xl">
+          <p className="label-red mb-3">Validated Reference Replay</p>
+          <h2 className="text-2xl font-medium uppercase tracking-[0.03em] text-ink">
+            Three evidence cases, one recurrence story
+          </h2>
+          <p className="mt-3 text-[12.5px] text-dim">
+            {entries === "error"
+              ? "Replay data unavailable right now — the backend may be cold-starting. Retrying automatically."
+              : "Loading replay data…"}
+          </p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="sessions" className="border-t border-rule bg-bg px-6 py-24">
       <div className="mx-auto max-w-6xl">

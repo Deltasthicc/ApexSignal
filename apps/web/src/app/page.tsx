@@ -15,9 +15,11 @@ import {
 import { TopBar } from "@/components/TopBar";
 import { Hero } from "@/components/Hero";
 import { PipelineSection } from "@/components/PipelineSection";
+import { LivePipelineDemo } from "@/components/LivePipelineDemo";
 import { SessionGrid } from "@/components/SessionGrid";
 import { LiveInspector } from "@/components/LiveInspector";
 import { EvidenceStory } from "@/components/EvidenceStory";
+import { HumanLoopSection } from "@/components/HumanLoopSection";
 import { ScopeSection } from "@/components/ScopeSection";
 import { MaterialsSection, TeamSection } from "@/components/MaterialsTeam";
 import {
@@ -123,16 +125,16 @@ export default function PitWallPage() {
 
         <PipelineSection />
 
+        <LivePipelineDemo />
+
         <CircuitAtlasSection />
 
-        {Array.isArray(entries) && entries.length > 0 && (
-          <SessionGrid
-            entries={entries}
-            radioCache={radioCache}
-            assessmentCache={assessmentCache}
-            onSelect={selectAndScrollToLive}
-          />
-        )}
+        <SessionGrid
+          entries={entries}
+          radioCache={radioCache}
+          assessmentCache={assessmentCache}
+          onSelect={selectAndScrollToLive}
+        />
 
         <LiveInspector
           health={health}
@@ -147,9 +149,9 @@ export default function PitWallPage() {
           totalLaps={totalLaps}
         />
 
-        {Array.isArray(entries) && entries.length > 0 && (
-          <EvidenceStory entries={entries} assessmentCache={assessmentCache} />
-        )}
+        <EvidenceStory entries={entries} assessmentCache={assessmentCache} />
+
+        <HumanLoopSection />
 
         <ScopeSection />
         <MaterialsSection />
