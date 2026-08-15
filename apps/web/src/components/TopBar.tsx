@@ -110,12 +110,20 @@ export function TopBar() {
           engineer console
         </Link>
       </nav>
-      <Link
-        href="/login"
-        className="border border-gold/50 px-3 py-1.5 text-gold transition hover:bg-gold hover:text-bg md:hidden"
-      >
-        Console
-      </Link>
+      <div className="flex items-center gap-2 md:hidden">
+        <Link
+          href={TECHNICAL_LINK.href}
+          className="border border-teal/50 bg-teal/5 px-2.5 py-1.5 text-teal transition hover:bg-teal hover:text-bg"
+        >
+          Tech
+        </Link>
+        <Link
+          href="/login"
+          className="border border-gold/50 px-3 py-1.5 text-gold transition hover:bg-gold hover:text-bg"
+        >
+          Console
+        </Link>
+      </div>
     </header>
   );
 }
