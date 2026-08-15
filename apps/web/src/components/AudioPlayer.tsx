@@ -22,9 +22,9 @@ export function AudioPlayer({
       />
       <p className="mt-2 text-[9px] leading-relaxed text-dim">
         Synthesized voice reading this incident&rsquo;s own transcript &mdash;
-        not a broadcast recording. Used because the real clip&rsquo;s
-        redistribution rights weren&rsquo;t confirmed; see
-        THIRD_PARTY_NOTICES.md.
+        not a broadcast recording. No real F1 team radio clip clears a
+        defensible bar for public redistribution (researched, settled
+        decision, not a placeholder); see THIRD_PARTY_NOTICES.md.
       </p>
     </div>
   );

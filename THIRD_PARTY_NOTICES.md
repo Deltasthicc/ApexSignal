@@ -74,6 +74,20 @@ excerpt without an explicit written license from Formula One Management for
 that specific recording and specific public use -- "found it online" or "it's
 short" are not defenses under any of the above.
 
+## Tone-model demo clips (`tone-demo-calm.mp3`, `tone-demo-urgent.mp3`)
+
+Two more synthesized clips (`apps/web/public/audio/tone-demo-calm.mp3` and
+`tone-demo-urgent.mp3`), same engine and voice as the reference clip above
+(Microsoft Edge TTS, `en-GB-RyanNeural`), generated 2026-08-15 specifically to
+demonstrate the acoustic tone model's calm-vs-urgent sensitivity on the
+product page (`ToneComparison.tsx`). Original text, not derived from any real
+broadcast; the only difference between the two is TTS delivery (rate/pitch/
+volume), not source material. Same rule as above applies -- fully original,
+no third-party rights, safe for public display. The `Arousal` scores shown
+next to them are real output from `services/radio_ai/app/tone.py` (the actual
+production VoiceCLAP scoring code, unmodified) run locally against these two
+files -- see `services/radio_ai/tone_test/run_tone_test.py` to reproduce.
+
 ## Hugging Face dataset (Workstream B development only)
 
 `MikCil/f1-team-radio` (tagged CC-BY-4.0 by its uploader, though the dataset

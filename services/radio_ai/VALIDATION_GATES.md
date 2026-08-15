@@ -167,6 +167,12 @@ Three more attempts, same rigor, all measured directly:
 
 **Honest conclusion, not a fifth architecture chased in diminishing returns**: this is the real ceiling of what modeling tricks can do on the current 58-example set. The actual bottleneck is the labeled data itself — 44/58 `NO_COMPLAINT`, 2 `FRONT_TURNIN_BRAKE`, 0 `TYRE_GRIP_DEGRADATION`. Gate 6a's 0.80 target needs a larger, more balanced labeled set before it needs another modeling idea. Still not attempted this session for the standing reason: it needs a human, not code.
 
+### 6f — 2026-08-15: trained linear probe, L1/L2 regularization, grid search (requested in team chat) — REJECTED, confirms 6e a fifth way — full detail in `GATE6_ERROR_ANALYSIS.md`
+
+Every classifier tried through 6e (NLI, embedding-prototype, richer prototypes, ensemble) has **zero trained parameters** — all fixed-prototype similarity, nothing for L1/L2 to regularize. This gate actually trains one: multinomial logistic regression on the same MiniLM embeddings, `penalty ∈ {l1, l2}` × `C ∈ {0.001..100}` (22 combos), `class_weight="balanced"`, evaluated with leave-one-out CV (k-fold still not meaningful — same n=2/n=0 class-count problem as 6e item 3). `scripts/experiment_linear_probe.py`.
+
+**Result: penalty=l2, C=0.1 → macro-F1=0.435 — a real -1.9pp regression vs. the 0.454 production baseline.** L1 collapses badly at low C (macro-F1=0.022 — the penalty zeroes out the smallest classes' coefficients entirely, model degenerates to predicting `NO_COMPLAINT` for nearly everything). `FRONT_TURNIN_BRAKE` still scores 0.000 under LOOCV: holding out one of its 2 examples leaves at most 1 to train on, and no regularization strength fixes that. **Rejected** — the fifth architecture in a row to land within ~2pp of 0.454, which reinforces 6e's conclusion rather than reopening it: the ceiling is the dataset (58 examples, one whole category at n=0), not the classifier family.
+
 ## Gate 7 — Day 5 holdout
 
 Keep ≥ 20 clips untouched by any threshold tuning. Run them once,

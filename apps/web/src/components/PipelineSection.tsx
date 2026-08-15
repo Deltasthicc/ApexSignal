@@ -1,4 +1,5 @@
 import { Reveal } from "@/components/Reveal";
+import { ToneComparison } from "@/components/ToneComparison";
 
 const CARDS = [
   {
@@ -105,6 +106,10 @@ export function PipelineSection() {
               ))}
             </div>
           </div>
+        </Reveal>
+
+        <Reveal delayMs={260}>
+          <ToneComparison />
         </Reveal>
       </div>
     </section>

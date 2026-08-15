@@ -491,3 +491,94 @@ needs a larger, more balanced labeled set before it needs another
 modeling idea -- see `VALIDATION_GATES.md` gate 6 "things worth
 trying" item 3 (more labeled data), still not attempted this session
 for the same standing reason: it needs a human, not code.
+
+## 2026-08-15: trained linear probe with L1/L2 regularization (requested in team chat) -- REJECTED, small regression, confirms item 4 a fifth way
+
+Team-chat request (Jagrav, 2026-08-15): run a hyperparameter search
+(grid or random) with L1/L2 regularization to improve the classifier.
+Worth stating plainly first: **the production classifier and every
+experiment above have zero trained parameters** -- they all compare a
+transcript embedding against a *fixed* prototype embedding (either the
+raw taxonomy description, or item 1's leave-one-out example average).
+There is no weight matrix for L1/L2 to shrink in that architecture, so
+the request doesn't map onto it directly. It does map onto a real,
+not-yet-tried alternative: train an actual multinomial logistic
+regression *on* the same MiniLM embeddings, instead of hand-picking a
+prototype. `scripts/experiment_linear_probe.py`.
+
+Grid: `penalty in {l1, l2}` x `C in {0.001, ..., 100}` (11 values,
+log-spaced) = 22 combinations, `class_weight="balanced"` to address the
+44/58 `NO_COMPLAINT` skew, `OneVsRestClassifier` wrapping `liblinear`
+(multinomial `liblinear` doesn't exist; OvR also fits better than a
+jointly-calibrated softmax at this sample size). Evaluated with
+**leave-one-out cross-validation**, not k-fold, for the same reason
+item 3 rejected k-fold for margin tuning: `FRONT_TURNIN_BRAKE` (n=2)
+and `TYRE_GRIP_DEGRADATION` (n=0) can't be stratified into folds
+without a fold missing the category entirely. LOOCV uses every one of
+the 58 examples as a held-out test point exactly once -- the honest
+evaluation for a dataset this small, not a shortcut.
+
+**Result: penalty=l2, C=0.1, macro-F1=0.435 (LOOCV) -- a real -1.9pp
+regression vs. the production embedding-prototype baseline (0.454).**
+Full grid (macro-F1):
+
+```
+penalty    C          macro-F1   accuracy
+l1         0.001      0.022      6.9%
+l1         0.003      0.022      6.9%
+l1         0.01       0.022      6.9%
+l1         0.03       0.022      6.9%
+l1         0.1        0.022      6.9%
+l1         0.3        0.022      6.9%
+l1         1.0        0.223      36.2%
+l1         3.0        0.270      65.5%
+l1         10.0       0.218      65.5%
+l1         30.0       0.220      67.2%
+l1         100.0      0.223      69.0%
+l2         0.001      0.307      41.4%
+l2         0.003      0.307      41.4%
+l2         0.01       0.346      53.4%
+l2         0.03       0.364      60.3%
+l2         0.1        0.435      75.9%   <- best
+l2         0.3        0.357      74.1%
+l2         1.0        0.388      77.6%
+l2         3.0        0.351      79.3%
+l2         10.0       0.292      77.6%
+l2         30.0       0.267      75.9%
+l2         100.0      0.267      75.9%
+```
+
+L1 is uniformly worse than L2 across the whole grid, and badly worse at
+low C -- at C<=0.3, L1's penalty is strong enough to zero out every
+coefficient for the smallest classes entirely (`FRONT_TURNIN_BRAKE`,
+n=2), so the model degenerates to predicting `NO_COMPLAINT` for almost
+everything (macro-F1=0.022 is that collapse, not noise). L2 never fully
+zeroes a class out, which matters more than usual when whole classes
+only have 2-4 examples to begin with.
+
+Per-class F1 at the best (l2, C=0.1):
+```
+MECHANICAL_OTHER             F1=0.500
+FRONT_TURNIN_BRAKE           F1=0.000
+EXIT_TRACTION_REAR           F1=0.600
+TYRE_GRIP_DEGRADATION        F1=0.000   (n=0, still unlearnable by any method)
+VISIBILITY_TRACK_CONDITION   F1=0.667
+NO_COMPLAINT                 F1=0.843
+```
+
+`FRONT_TURNIN_BRAKE` scores 0.000 under LOOCV specifically because,
+when either of its 2 examples is held out, at most 1 example remains
+to train on -- no regularization strength fixes a category the model
+saw once. This is the same wall item 4 already named, now hit a fifth
+way: hierarchical gate (rejected), stricter taxonomy wording (rejected),
+richer prototypes (rejected, -1.2pp), ensembling (rejected, -2.2pp),
+and now a trained linear probe with a real regularization search
+(rejected, -1.9pp). Every architecture tried lands within about 2pp of
+0.454 in either direction. **Confirms item 4's conclusion rather than
+overturning it: the ceiling is the 58-example, 5-populated-category
+dataset, not the choice of classifier architecture.** The next real
+lever is still more labeled data -- specifically enough
+`FRONT_TURNIN_BRAKE` and any `TYRE_GRIP_DEGRADATION` examples to give a
+trained model something to learn beyond "always predict
+`NO_COMPLAINT`" -- and that still needs a human doing the labeling, not
+another modeling idea run against the same 58 rows.

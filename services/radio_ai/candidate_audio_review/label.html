@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ApexSignal — candidate clip review</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 16px 20px 80px; background: #111; color: #eee; }
+  h1 { font-size: 20px; }
+  .notice { background: #2a1f00; border: 1px solid #7a5c00; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 20px; }
+  .card { border: 1px solid #333; border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; background: #1a1a1a; }
+  .meta { font-size: 12px; color: #999; margin-bottom: 6px; }
+  .badge { display: inline-block; background: #333; color: #ddd; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 6px; }
+  .transcript { font-style: italic; color: #ccc; margin: 8px 0; }
+  audio { width: 100%; margin: 8px 0; }
+  label { font-size: 12px; color: #aaa; display: block; margin-top: 8px; }
+  select, textarea, input[type=text] { width: 100%; box-sizing: border-box; background: #0d0d0d; color: #eee; border: 1px solid #444; border-radius: 4px; padding: 6px 8px; font-size: 13px; }
+  textarea { resize: vertical; min-height: 40px; }
+  .done { border-color: #2e7d32; background: #12210f; }
+  #bar { position: fixed; bottom: 0; left: 0; right: 0; background: #000; border-top: 1px solid #333; padding: 10px 20px; display: flex; align-items: center; gap: 16px; }
+  #bar span { font-size: 13px; color: #ccc; }
+  button { background: #d32f2f; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+  button:hover { background: #b71c1c; }
+</style>
+</head>
+<body>
+
+<h1>ApexSignal — candidate clip review (30 clips)</h1>
+<div class="notice">
+  <strong>Internal validation use only.</strong> These are real MikCil/f1-team-radio broadcast
+  clips, pre-ranked by the production classifier's own embedding similarity — not random keyword
+  matches. Listen, correct the transcript by ear if the ASR text looks off, and pick the true
+  category. This data trains/evaluates the classifier only — per <code>THIRD_PARTY_NOTICES.md</code>,
+  these clips must never appear in the public demo, a slide, or a recording shown to anyone outside
+  the team.
+</div>
+
+<div id="cards"></div>
+
+<div id="bar">
+  <span id="progress">0 / 30 labeled</span>
+  <button onclick="downloadCsv()">Download labeled CSV</button>
+</div>
+
+<script>
+const CLIPS = [{"id": "2023_Monaco_Grand_Prix_NICHUL01_27_20230528_144112", "transcription": "A lot of understeer creeping in. All speeds, but also traction getting very poor.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.605", "grand_prix": "2023 Monaco Grand Prix", "driver_id": "NICHUL01"}, {"id": "2023_Bahrain_Grand_Prix_NICHUL01_27_20230305_152700", "transcription": "When I get very close in braking the front just is like it has uplift", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.564", "grand_prix": "2023 Bahrain Grand Prix", "driver_id": "NICHUL01"}, {"id": "2019_Canadian_Grand_Prix_GEORUS01_63_20190609_183634", "transcription": "I've got a bit of rear instability into turn 6 under braking on the entry phase. This is something I experienced a bit in P2 as well. Just lucky if there's anything we can do with tools to improve that.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.556", "grand_prix": "2019 Canadian Grand Prix", "driver_id": "GEORUS01"}, {"id": "2025_Monaco_Grand_Prix_GEORUS01_63_20250525_160515", "transcription": "It's driving dangerously slow, the slamming of the brakes at all areas. Copy that.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.524", "grand_prix": "2025 Monaco Grand Prix", "driver_id": "GEORUS01"}, {"id": "2021_Styrian_Grand_Prix_LEWHAM01_44_20210627_141517", "transcription": "Okay, place that can prove. Standby. So, main areas: braking turn three, braking turn four.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.520", "grand_prix": "2021 Styrian Grand Prix", "driver_id": "LEWHAM01"}, {"id": "2019_Brazilian_Grand_Prix_LEWHAM01_44_20191117_171148", "transcription": "Don't know why, but I got a big difference between the two front brakes.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.519", "grand_prix": "2019 Brazilian Grand Prix", "driver_id": "LEWHAM01"}, {"id": "2023_Mexico_City_Grand_Prix_NICHUL01_27_20231029_213013", "transcription": "What's going on in the rear? Sadly have a loss of rear grip.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.516", "grand_prix": "2023 Mexico City Grand Prix", "driver_id": "NICHUL01"}, {"id": "2021_French_Grand_Prix_GEORUS01_63_20210620_132947", "transcription": "On a couple of occasions, there was a bit of vibration from the front axle when braking, but nothing crazy.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.516", "grand_prix": "2021 French Grand Prix", "driver_id": "GEORUS01"}, {"id": "2024_Mexico_City_Grand_Prix_LIALAW01_30_20241027_152710", "transcription": "Struggling at high speed with the front.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.514", "grand_prix": "2024 Mexico City Grand Prix", "driver_id": "LIALAW01"}, {"id": "2019_Mexican_Grand_Prix_KEVMAG01_20_20191027_192529", "transcription": "Kevin, brake balance one click forward. We have a lot of rear locking. Same pace as cars ahead. Good job. No sign of graining. No sign. Yes, understood. Rear overheating very high. Brake balance forward, if you can take it, will help. The lifting coast will help.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.512", "grand_prix": "2019 Mexican Grand Prix", "driver_id": "KEVMAG01"}, {"id": "2021_Styrian_Grand_Prix_MAXVER01_33_20210627_150731", "transcription": "Okay, Max, so specifically the issue is braking turn 10 whilst on the curb. Just for information. Gap 7.5. Oh, mate, do you see that moment in 7? Seen that. A change in wind.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.508", "grand_prix": "2021 Styrian Grand Prix", "driver_id": "MAXVER01"}, {"id": "2019_Spanish_Grand_Prix_SERPER01_11_20190512_145338", "transcription": "Consider diff and brake balance to help front left slips, help front left slips 5, 10, 14.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.507", "grand_prix": "2019 Spanish Grand Prix", "driver_id": "SERPER01"}, {"id": "2021_São_Paulo_Grand_Prix_LANSTR01_18_20211114_170941", "transcription": "Feels like there's a lot of understeer now. I think there's quite a bit of damage. Yeah, copy, copy. If you've got understeer, go the other way with the diff. Open the diff to reduce the understeer. Down on diff mid as well if you need. Can you confirm if there's a lot of damage? Be more specific. Yes. We have damage to the left hand side forward floor. We're checking on the numbers, but the car is okay to push for now. Yeah, it feels terrible. There's no grip man, I think I'm losing a lot of load", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.506", "grand_prix": "2021 São Paulo Grand Prix", "driver_id": "LANSTR01"}, {"id": "2021_Styrian_Grand_Prix_MAXVER01_33_20210627_150417", "transcription": "Hey Max, so specifically the issue is braking turn 10 whilst on the curb. Just for information.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.503", "grand_prix": "2021 Styrian Grand Prix", "driver_id": "MAXVER01"}, {"id": "2019_Bahrain_Grand_Prix_DANRIC01_3_20190331_171947", "transcription": "Yeah, still the rears hurt me on traction but struggling a lot with front locking so trying to talk about coming rearwards. Okay, understood.", "target_category": "FRONT_TURNIN_BRAKE", "similarity": "0.502", "grand_prix": "2019 Bahrain Grand Prix", "driver_id": "DANRIC01"}, {"id": "2023_Spanish_Grand_Prix_OSCPIA01_81_20230604_143516", "transcription": "And Oscar confirming the tyre degradation is all thermal, not worried about wear, not worried about graining on this tyre, it's all about thermal management.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.613", "grand_prix": "2023 Spanish Grand Prix", "driver_id": "OSCPIA01"}, {"id": "2021_Mexico_City_Grand_Prix_MAXVER01_33_20211107_200820", "transcription": "Your tyre surface condition looks very good, Max.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.555", "grand_prix": "2021 Mexico City Grand Prix", "driver_id": "MAXVER01"}, {"id": "2020_Spanish_Grand_Prix_SERPER01_11_20200816_142358", "transcription": "How are the tyres? So, Checo, tyres are looking okay at the moment, but they are at the hottest, so, slip management now is critical.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.554", "grand_prix": "2020 Spanish Grand Prix", "driver_id": "SERPER01"}, {"id": "2018_Italian_Grand_Prix_LEWHAM01_44_20180902_154030", "transcription": "Tires still good. Okay, copy, just keep the information coming.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.548", "grand_prix": "2018 Italian Grand Prix", "driver_id": "LEWHAM01"}, {"id": "2020_Belgian_Grand_Prix_ESTOCO01_31_20200830_145109", "transcription": "Tire temps are stabilised and are good.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.543", "grand_prix": "2020 Belgian Grand Prix", "driver_id": "ESTOCO01"}, {"id": "2018_Abu_Dhabi_Grand_Prix_STOVAN01_2_20181125_181031", "transcription": "These tires are not doing well. Copy.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.540", "grand_prix": "2018 Abu Dhabi Grand Prix", "driver_id": "STOVAN01"}, {"id": "2021_Mexico_City_Grand_Prix_LEWHAM01_44_20211107_192411", "transcription": "Tires dropping off, messes in the...", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.538", "grand_prix": "2021 Mexico City Grand Prix", "driver_id": "LEWHAM01"}, {"id": "2018_Japanese_Grand_Prix_MAXVER01_33_20181007_151902", "transcription": "Tire temperatures are stable. They've been very stable over the last five laps.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.536", "grand_prix": "2018 Japanese Grand Prix", "driver_id": "MAXVER01"}, {"id": "2024_São_Paulo_Grand_Prix_LANNOR01_4_20241103_151243", "transcription": "If the weather stays as it does, we think it will be these tyres to the end. So it will be about tyre condition and racing cars on track.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.531", "grand_prix": "2024 São Paulo Grand Prix", "driver_id": "LANNOR01"}, {"id": "2023_Belgian_Grand_Prix_ALEALB01_23_20230730_153213", "transcription": "A lot of people struggle with the tires, but some great overtakes today. There's quite a few of them.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.529", "grand_prix": "2023 Belgian Grand Prix", "driver_id": "ALEALB01"}, {"id": "2020_Turkish_Grand_Prix_ESTOCO01_31_20201115_105452", "transcription": "Tire temperatures are all still good.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.528", "grand_prix": "2020 Turkish Grand Prix", "driver_id": "ESTOCO01"}, {"id": "2018_Austrian_Grand_Prix_MAXVER01_33_20180701_162236", "transcription": "How are their tyres compared to mine? They're okay on tyres at the moment, Max. We are happy with yours.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.527", "grand_prix": "2018 Austrian Grand Prix", "driver_id": "MAXVER01"}, {"id": "2018_Abu_Dhabi_Grand_Prix_LEWHAM01_44_20181125_180520", "transcription": "My tires definitely don't feel great. Okay, copy.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.523", "grand_prix": "2018 Abu Dhabi Grand Prix", "driver_id": "LEWHAM01"}, {"id": "2024_Belgian_Grand_Prix_KEVMAG01_20_20240728_152713", "transcription": "Tires are much better than expected.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.520", "grand_prix": "2024 Belgian Grand Prix", "driver_id": "KEVMAG01"}, {"id": "2018_Mexican_Grand_Prix_LEWHAM01_44_20181028_132341", "transcription": "The tyres are quite fragile.", "target_category": "TYRE_GRIP_DEGRADATION", "similarity": "0.520", "grand_prix": "2018 Mexican Grand Prix", "driver_id": "LEWHAM01"}];
+
+const LABELS = [
+  "", "NO_COMPLAINT", "EXIT_TRACTION_REAR", "FRONT_TURNIN_BRAKE",
+  "TYRE_GRIP_DEGRADATION", "VISIBILITY_TRACK_CONDITION", "MECHANICAL_OTHER",
+];
+
+const container = document.getElementById("cards");
+CLIPS.forEach((clip, i) => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.id = `card-${i}`;
+  card.innerHTML = `
+    <div class="meta">
+      <span class="badge">target: ${clip.target_category}</span>
+      <span class="badge">similarity ${clip.similarity}</span>
+      <span class="badge">${clip.grand_prix}</span>
+      <span class="badge">${clip.driver_id}</span>
+    </div>
+    <audio controls preload="none" src="${clip.id}.mp3"></audio>
+    <div class="transcript">ASR (unverified): "${clip.transcription.replace(/"/g, "&quot;")}"</div>
+    <label>Corrected transcript (edit if the ASR got it wrong; leave as-is if it's fine)</label>
+    <textarea id="transcript-${i}">${clip.transcription}</textarea>
+    <label>True category (listen first)</label>
+    <select id="label-${i}" onchange="updateProgress()">
+      ${LABELS.map(l => `<option value="${l}">${l || "-- select --"}</option>`).join("")}
+    </select>
+    <label>Notes (optional — sarcasm, third-party mention, ambiguous, etc.)</label>
+    <input type="text" id="notes-${i}">
+  `;
+  container.appendChild(card);
+});
+
+function updateProgress() {
+  let done = 0;
+  CLIPS.forEach((_, i) => {
+    const val = document.getElementById(`label-${i}`).value;
+    const card = document.getElementById(`card-${i}`);
+    if (val) { done++; card.classList.add("done"); } else { card.classList.remove("done"); }
+  });
+  document.getElementById("progress").textContent = `${done} / ${CLIPS.length} labeled`;
+}
+
+function csvEscape(s) {
+  if (s == null) s = "";
+  s = String(s);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+function downloadCsv() {
+  const rows = [["id", "transcription", "human_label", "notes"]];
+  CLIPS.forEach((clip, i) => {
+    const transcript = document.getElementById(`transcript-${i}`).value;
+    const label = document.getElementById(`label-${i}`).value;
+    const notes = document.getElementById(`notes-${i}`).value;
+    rows.push([clip.id, transcript, label, notes]);
+  });
+  const csv = rows.map(r => r.map(csvEscape).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "candidate_review_labeled.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+</script>
+</body>
+</html>
