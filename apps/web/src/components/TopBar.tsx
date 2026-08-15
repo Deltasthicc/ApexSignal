@@ -11,6 +11,8 @@ const PRIMARY_LINKS = [
   { href: "#human-loop", label: "human-in-the-loop" },
 ];
 
+const TECHNICAL_LINK = { href: "/technical", label: "technical walkthrough" };
+
 const MORE_LINKS = [
   { href: "#circuits", label: "circuits" },
   { href: "#sessions", label: "replay cases" },
@@ -48,6 +50,13 @@ export function TopBar() {
             {link.label}
           </a>
         ))}
+
+        <Link
+          href={TECHNICAL_LINK.href}
+          className="border border-teal/50 bg-teal/5 px-2.5 py-1 text-teal transition hover:bg-teal hover:text-bg"
+        >
+          {TECHNICAL_LINK.label}
+        </Link>
 
         <div ref={moreRef} className="relative">
           <button
