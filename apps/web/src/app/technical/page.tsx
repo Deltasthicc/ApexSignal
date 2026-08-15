@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { TopBar } from "@/components/TopBar";
 import { PipelineDiagram } from "@/components/dashboard/PipelineDiagram";
 import { SystemDesignDiagram } from "@/components/dashboard/SystemDesignDiagram";
-import { WorkflowCodeMap } from "@/components/dashboard/WorkflowCodeMap";
 
 export const metadata: Metadata = {
   title: "ApexSignal — Technical Walkthrough",
@@ -29,7 +28,30 @@ export default function TechnicalPage() {
 
         <div className="flex flex-col gap-6">
           <PipelineDiagram />
-          <WorkflowCodeMap />
+
+          <Link
+            href="/technical/system-design-workflow"
+            className="group flex items-center justify-between border border-teal/50 bg-teal/5 px-6 py-5 transition hover:bg-teal/10"
+          >
+            <span>
+              <span className="mb-1 block text-[9px] uppercase tracking-[0.16em] text-teal">
+                Flowchart + code map
+              </span>
+              <span className="block text-base font-medium uppercase tracking-[0.03em] text-ink">
+                System Design Workflow
+              </span>
+              <span className="mt-1 block max-w-xl text-[11.5px] leading-relaxed text-dim">
+                A visual, top-to-bottom diagram of the whole radio-to-verdict
+                pipeline, plus every stage's exact file, function, and
+                parameter — the reference to point to when explaining the
+                product or answering a technical question.
+              </span>
+            </span>
+            <span className="ml-4 shrink-0 text-teal transition group-hover:translate-x-1">
+              &rarr;
+            </span>
+          </Link>
+
           <SystemDesignDiagram />
         </div>
 
