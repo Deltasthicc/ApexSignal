@@ -42,7 +42,7 @@ export default function TechnicalPage() {
               </span>
               <span className="mt-1 block max-w-xl text-[11.5px] leading-relaxed text-dim">
                 A visual, top-to-bottom diagram of the whole radio-to-verdict
-                pipeline, plus every stage's exact file, function, and
+                pipeline, plus every stage&apos;s exact file, function, and
                 parameter — the reference to point to when explaining the
                 product or answering a technical question.
               </span>
